@@ -390,7 +390,7 @@ class World {
      * @param {Cell} b
      */
     resolveRigidCheck(a, b) {
-        let dx = b.x - a.x;
+        /*let dx = b.x - a.x;
         let dy = b.y - a.y;
         let d = Math.sqrt(dx * dx + dy * dy);
         const m = a.size + b.size - d;
@@ -404,10 +404,37 @@ class World {
         a.y -= dy * m * aM;
         b.x += dx * m * bM;
         b.y += dy * m * bM;
-        this.bounceCell(a);
-        this.bounceCell(b);
+
         this.updateCell(a);
         this.updateCell(b);
+        this.bounceCell(a);
+        this.bounceCell(b);*/
+        
+        
+
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let d = Math.sqrt(dx * dx + dy * dy);
+        var r = a.size + b.size; // radius sum of cell & check
+        var push = Math.min((r - d) / d, r - d); // min extrusion force
+        if (push / r < 0) return;
+        // body impulse
+        var ms = a.squareSize + b.squareSize;
+        //ms/=.5
+        //push*=1.9
+        ms/=.2
+        push*=3.9
+        var m1 = push * (b.squareSize / ms);
+        var m2 = push * (a.squareSize / ms);
+        // apply extrusion force
+        a.x -= dx * m1;
+        a.y -= dy * m1;
+        b.x += dx * m2;
+        b.y += dy * m2;
+        this.updateCell(a);
+        this.updateCell(b);
+        //this.bounceCell(a);
+        //this.bounceCell(b);
     }
 
     /**
@@ -570,11 +597,12 @@ class World {
         const loss = this.settings.ejectingLoss * this.settings.ejectingLoss;
         const router = player.router;
         const l = player.ownedCells.length;
-        let i = 0;
-        for (; i < l; i++) {
+        let ejected = 0
+        for (let i = 0; i < l; i++) {
             const cell = player.ownedCells[i];
             if (cell.size < this.settings.playerMinEjectSize)
                 continue;
+            ejected++
             let dx = router.mouseX - cell.x;
             let dy = router.mouseY - cell.y;
             let d = Math.sqrt(dx * dx + dy * dy);
@@ -582,7 +610,7 @@ class World {
             else dx /= d, dy /= d;
             const sx = cell.x + dx * cell.size;
             const sy = cell.y + dy * cell.size;
-            const newCell = new EjectedCell(this, player, sx, sy, cell.color);
+            const newCell = new EjectedCell(this, player, sx, sy, cell.color, cell);
             const a = Math.atan2(dx, dy) - dispersion + Math.random() * 2 * dispersion;
             newCell.boost.dx = Math.sin(a);
             newCell.boost.dy = Math.cos(a);
@@ -592,7 +620,7 @@ class World {
             cell.squareSize -= loss;
             this.updateCell(cell);
         }
-        return i
+        return ejected
     }
 
     /**

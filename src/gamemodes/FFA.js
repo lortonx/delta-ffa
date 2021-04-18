@@ -82,7 +82,8 @@ class FFA extends Gamemode {
         if (!player.hasWorld) return;
         const pieces = player.world.ejectFromPlayer(player);
         if (player.world.settings.playerExtraDecayEnabled && pieces > 0) {
-            player.extraDecayMult += (player.world.settings.playerExtraDecayEjectLoss/**pieces*/)+(player.extraDecayMult/100*3)
+            //console.log(pieces,player.extraDecayMult)
+            player.extraDecayMult += player.world.settings.playerExtraDecayEjectLoss
         }
 
     }
@@ -91,7 +92,7 @@ class FFA extends Gamemode {
 
         const pieces = player.world.splitPlayer(player);
         if (player.world.settings.playerExtraDecayEnabled && pieces > 0) {
-            player.extraDecayMult += (player.world.settings.playerExtraDecaySplitLoss+(player.extraDecayMult/100*10))
+            player.extraDecayMult += (player.world.settings.playerExtraDecaySplitLoss+(player.extraDecayMult/100*13))
             //player.extraDecayMult += player.world.settings.playerExtraDecaySplitLoss
         }
     }

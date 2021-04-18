@@ -2,15 +2,16 @@ const Router = require("./Router");
 const Reader = require("../primitives/Reader");
 const { filterIPAddress } = require("../primitives/Misc");
 
+
 class Connection extends Router {
     /**
      * @param {Listener} listener
      * @param {WebSocket} webSocket
      */
-    constructor(listener, webSocket) {
+    constructor(listener, socketData) {
         super(listener);
-        this.remoteAddress = filterIPAddress(webSocket._socket.remoteAddress);
-        this.webSocket = webSocket;
+        this.remoteAddress = filterIPAddress(socketData.ip);
+        this.webSocket = null//webSocket;
         this.connectTime = Date.now();
         this.lastActivityTime = Date.now();
         this.lastChatTime = Date.now();
@@ -29,19 +30,18 @@ class Connection extends Router {
         this.minionsFrozen = false;
         this.controllingMinions = false;
 
-        webSocket.on("close", this.onSocketClose.bind(this));
-        webSocket.on("message", this.onSocketMessage.bind(this));
-        webSocket.on("ping", this.closeSocket.bind(this, 1003, "Unexpected message format"));
-        webSocket.on("pong", this.closeSocket.bind(this, 1003, "Unexpected message format"));
+        //webSocket.on("close", this.onSocketClose.bind(this));
+        //webSocket.on("message", this.onSocketMessage.bind(this));
+        //webSocket.on("ping", this.closeSocket.bind(this, 1003, "Unexpected message format"));
+        //webSocket.on("pong", this.closeSocket.bind(this, 1003, "Unexpected message format"));
     }
-
     close() {
         if (!this.socketDisconnected) return void this.closeSocket(1001, "Manual connection close call");
         super.close();
         this.disconnected = true;
         this.disconnectionTick = this.handle.tick;
         this.listener.onDisconnection(this, this.closeCode, this.closeReason);
-        this.webSocket.removeAllListeners();
+        //this.webSocket.removeAllListeners();
     }
 
     static get type() { return "connection"; }
@@ -145,7 +145,7 @@ class Connection extends Router {
 
         if (player.state === 1 || player.state === 2)
             this.protocol.onSpectatePosition(player.viewArea);
-        if (this.handle.tick % 4 === 0)
+        if (this.handle.tick % 30 === 0)
             this.handle.gamemode.sendLeaderboard(this);
         this.protocol.onVisibleCellUpdate(add, upd, eat, del);
     }
@@ -163,18 +163,19 @@ class Connection extends Router {
     /** @param {Buffer} data */
     send(data) {
         if (this.socketDisconnected) return;
-        this.webSocket.send(data);
+        this.webSocket.send(data, true);
     }
     /**
      * @param {number=} code
      * @param {string=} reason
      */
     closeSocket(code, reason) {
+        console.log('closeSocket',code,reason)
         if (this.socketDisconnected) return;
         this.socketDisconnected = true;
         this.closeCode = code;
         this.closeReason = reason;
-        this.webSocket.close(code || 1006, reason || "");
+        this.webSocket.end(code || 1006, reason || "");
     }
 }
 

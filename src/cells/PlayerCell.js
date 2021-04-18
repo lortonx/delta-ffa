@@ -18,7 +18,7 @@ class PlayerCell extends Cell {
     }
 
     get moveSpeed() {
-        return 88 * Math.pow(this.size, -0.4396754) * this.owner.settings.playerMoveMult;
+        return 88 * Math.pow(this.size, -0.396754) * this.owner.settings.playerMoveMult;
     }
     get canMerge() { return this._canMerge; }
 
@@ -31,7 +31,7 @@ class PlayerCell extends Cell {
      * @param {Cell} other
      * @returns {CellEatResult}
      */
-    getEatResult(other) {
+    getEatResult(other) { 
         if (other.type === 0) {
             const delay = this.world.settings.playerNoCollideDelay;
             if (other.owner.id === this.owner.id) {
@@ -45,6 +45,10 @@ class PlayerCell extends Cell {
         }
         if (other.type === 4 && other.size > this.size * this.world.settings.worldEatMult) return 3;
         if (other.type === 1) return 2;
+        if (other.type === 3) {
+            if(other.cellEjector.id === this.id && other.age < this.world.settings.ejectedNoCollideDelay ||
+                 other.cellEjector.owner.id === this.owner.id && other.age < 1) return 0
+        }
         return this.getDefaultEatResult(other);
     }
     /**

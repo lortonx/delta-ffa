@@ -21,8 +21,6 @@
         "url": "https://github.com/Luka967/OgarII/issues"
     },
     "dependencies": {
-        "uws": "^200.0.0",
-        "websocket": "^1.0.33",
-        "ws": "^7.4.3"
+        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.14.0"
     }
 }

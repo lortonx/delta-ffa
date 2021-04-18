@@ -8,10 +8,11 @@ class EjectedCell extends Cell {
      * @param {number} y
      * @param {number} color
      */
-    constructor(world, owner, x, y, color) {
+    constructor(world, owner, x, y, color, cellEjector) {
         const size = world.settings.ejectedSize;
         super(world, x, y, size, color);
         this.owner = owner;
+        this.cellEjector = cellEjector
     }
 
     get type() { return 3; }

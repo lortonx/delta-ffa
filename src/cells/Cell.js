@@ -29,6 +29,8 @@ class Cell {
 
         /** @type {Player} */
         this.owner = null;
+        /** @type {Cell} */
+        this.cellEjector = null;
 
         this.x = x;
         this.y = y;

@@ -1,6 +1,10 @@
 //const uWS = require('./uWebSockets.js-18.14.0/uws.js')
-const WebSocket = require("ws");
-const WebSocketServer = WebSocket.Server;
+//const WebSocket = require("ws");
+//const WebSocketServer = WebSocket.Server;
+
+const uWS = require('uWebSockets.js')
+const path = require('path')
+
 
 const Connection = require("./Connection");
 const ChatChannel = require("./ChatChannel");
@@ -30,11 +34,33 @@ class Listener {
     open() {
         if (this.listenerSocket !== null) return false;
         this.logger.debug(`listener opening at ${this.settings.listeningPort}`);
-        this.listenerSocket = new WebSocketServer({
+        /*this.listenerSocket = new WebSocketServer({
             port: this.settings.listeningPort,
             verifyClient: this.verifyClient.bind(this)
-        }, this.onOpen.bind(this));
-        this.listenerSocket.on("connection", this.onConnection.bind(this));
+        }, this.onOpen.bind(this));*/
+        this.listenerSocket = uWS./*SSL*/App({
+        }).ws('/', {
+            /* There are many common helper features */
+            idleTimeout: 36000,
+            maxBackpressure: 1024,
+            maxPayloadLength: 512,
+            //compression: DEDICATED_COMPRESSOR_3KB,
+            upgrade: this.verifyClient.bind(this),
+            open: this.onConnection.bind(this),
+            message: (ws, message, isBinary) => {
+                ws.connection.onSocketMessage(message, isBinary)
+            },
+            close: (ws, code, message) => {
+                ws.connection.onSocketClose(code, message)
+                console.log(this.connectionsByIP)
+            }
+            
+        }).listen(this.settings.listeningPort, (listenSocket) => {
+            if (listenSocket) this.logger.debug(`listener opening at ${this.settings.listeningPort}`);
+            console.log(listenSocket,`listener opening at ${this.settings.listeningPort}`)
+        })
+
+        //this.listenerSocket.on("connection", this.onConnection.bind(this));
         return true;
     }
     close() {
@@ -49,31 +75,53 @@ class Listener {
      * @param {{req: any, origin: string}} info
      * @param {*} response
      */
-    verifyClient(info, response) {
-        const address = filterIPAddress(info.req.socket.remoteAddress);
-        this.logger.onAccess(`REQUEST FROM ${address}, ${info.secure ? "" : "not "}secure, Origin: ${info.origin}`);
+    verifyClient(res, req, context) {
+        const connection_ip = new Uint8Array(res.getRemoteAddress().slice(-4)).join('.')
+        let socketData = {
+            connection: null,
+            ip: req.getHeader('fly-client-ip') || connection_ip,
+            url: req.getUrl()+'?'+req.getQuery(),
+            origin: req.getHeader('origin'),
+            websocketKey: req.getHeader('sec-websocket-key'),
+        }
+
+        const address = filterIPAddress(socketData.ip);
+        this.logger.onAccess(`REQUEST FROM ${address}, Origin: ${socketData.origin}`);
         if (this.connections.length > this.settings.listenerMaxConnections) {
             this.logger.debug("listenerMaxConnections reached, dropping new connections");
+            return res.end('', null, '\t')
             return void response(false, 503, "Service Unavailable");
         }
         const acceptedOrigins = this.settings.listenerAcceptedOrigins;
-        if (acceptedOrigins.length > 0 && acceptedOrigins.indexOf(info.origin) === -1) {
-            this.logger.debug(`listenerAcceptedOrigins doesn't contain ${info.origin}`);
+        if (acceptedOrigins.length > 0 && acceptedOrigins.indexOf(socketData.origin) === -1) {
+            this.logger.debug(`listenerAcceptedOrigins doesn't contain ${socketData.origin}`);
+            return res.end('', null, '\t')
             return void response(false, 403, "Forbidden");
         }
         if (this.settings.listenerForbiddenIPs.indexOf(address) !== -1) {
             this.logger.debug(`listenerForbiddenIPs contains ${address}, dropping connection`);
+            return res.end('', null, '\t')
             return void response(false, 403, "Forbidden");
         }
         if (this.settings.listenerMaxConnectionsPerIP > 0) {
             const count = this.connectionsByIP[address];
             if (count && count >= this.settings.listenerMaxConnectionsPerIP) {
                 this.logger.debug(`listenerMaxConnectionsPerIP reached for '${address}', dropping its new connections`);
+                return res.end('', null, '\t')
                 return void response(false, 403, "Forbidden");
             }
         }
         this.logger.debug("client verification passed");
-        response(true);
+        //response(true);
+
+
+        const newConnection = new Connection(this, socketData);
+        socketData.connection = newConnection
+        res.upgrade(socketData,
+            req.getHeader('sec-websocket-key'),
+            req.getHeader('sec-websocket-protocol'),
+            req.getHeader('sec-websocket-extensions'),
+        context);
     }
     onOpen() {
         this.logger.inform(`listener open at ${this.settings.listeningPort}`);
@@ -95,8 +143,9 @@ class Listener {
     /**
      * @param {WebSocket} webSocket
      */
-    onConnection(webSocket) {
-        const newConnection = new Connection(this, webSocket);
+    onConnection(ws) {
+        const newConnection = ws.connection
+        ws.connection.webSocket = ws
         this.logger.onAccess(`CONNECTION FROM ${newConnection.remoteAddress}`);
         this.connectionsByIP[newConnection.remoteAddress] =
             this.connectionsByIP[newConnection.remoteAddress] + 1 || 1;
