@@ -1,7 +1,8 @@
 const Protocol = require("./Protocol");
 const Reader = require("../primitives/Reader");
 const Writer = require("../primitives/Writer");
-
+const MiniLZ4 = require("./mini-lz4");
+const BufferPool = /*new DataView(*/new Uint8Array(1048576)//); // 10 mb
 class LegacyProtocol extends Protocol {
     /**
      * @param {Connection} connection
@@ -253,7 +254,19 @@ class LegacyProtocol extends Protocol {
         l = del.length;
         writer[this.protocol < 6 ? "writeUInt32" : "writeUInt16"](l);
         for (i = 0; i < l; i++) writer.writeUInt32(del[i].id);
-        this.send(writer.finalize());
+        if(this.protocol === 22){
+            const sourceBuffer = writer.finalize()
+            const uncompressedSize = sourceBuffer.byteLength
+            const compressedSize = MiniLZ4.compress(sourceBuffer,BufferPool,5)
+            if(compressedSize === 0) return this.send(sourceBuffer);
+            const compressed = new DataView(BufferPool.slice(0,compressedSize+5).buffer)
+            compressed.setUint8(0,255)
+            compressed.setUint32(1,uncompressedSize,true)
+            this.send(compressed.buffer);
+        }else{
+            this.send(writer.finalize());
+        }
+        
     }
 }
 
@@ -281,7 +294,8 @@ const pieLeaderboard = {
     19: pieLeaderboard4,
     20: pieLeaderboard4,
     21: pieLeaderboard21,
-    22: pieLeaderboard21
+    22: pieLeaderboard21,
+    23: pieLeaderboard21
 };
 /**
  * @param {Writer} writer
@@ -332,7 +346,8 @@ const ffaLeaderboard = {
     19: ffaLeaderboard11,
     20: ffaLeaderboard11,
     21: ffaLeaderboard11,
-    22: ffaLeaderboard11
+    22: ffaLeaderboard11,
+    23: ffaLeaderboard11
 };
 /**
  * @param {Writer} writer
@@ -392,7 +407,8 @@ const textBoard = {
     19: textBoard14,
     20: textBoard14,
     21: textBoard14,
-    22: textBoard14
+    22: textBoard14,
+    23: textBoard14
 };
 /**
  * @param {Writer} writer
@@ -440,7 +456,8 @@ const writeCellData = {
     19: writeCellData11,
     20: writeCellData11,
     21: writeCellData11,
-    22: writeCellData11
+    22: writeCellData11,
+    23: writeCellData11
 };
 /**
  * @param {Writer} writer

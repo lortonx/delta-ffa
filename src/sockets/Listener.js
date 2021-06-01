@@ -25,7 +25,22 @@ class Listener {
         /** @type {Connection[]} */
         this.connections = [];
         /** @type {Counter<IPAddress>} */
-        this.connectionsByIP = { };
+        this.connectionsByIP = {};
+        /* Антиддос система */
+        this.sock = null
+        this.upgradeQueue = []
+        this.CONN_THROTTLE = 5;
+        this.conn = 0
+        this.upgradeInterval = setInterval(() => {
+            this.conn = 0;
+            if (!this.upgradeQueue.length) return;
+            for (let i = Math.min(this.CONN_THROTTLE || 1, this.upgradeQueue.length); i > 0; i--) {
+                const [res, socketData, key, protocol, ext, context] = this.upgradeQueue.shift();
+                const newConnection = new Connection(this, socketData);
+                socketData.connection = newConnection
+                res.upgrade(socketData, key, protocol, ext, context);
+            }
+        }, 250);
     }
 
     get settings() { return this.handle.settings; }
@@ -44,7 +59,7 @@ class Listener {
             idleTimeout: 36000,
             maxBackpressure: 1024,
             maxPayloadLength: 512,
-            //compression: DEDICATED_COMPRESSOR_3KB,
+            compression: uWS.DEDICATED_COMPRESSOR_4KB,
             upgrade: this.verifyClient.bind(this),
             open: this.onConnection.bind(this),
             message: (ws, message, isBinary) => {
@@ -56,6 +71,7 @@ class Listener {
             }
             
         }).listen(this.settings.listeningPort, (listenSocket) => {
+            this.sock = listenSocket
             if (listenSocket) this.logger.debug(`listener opening at ${this.settings.listeningPort}`);
             console.log(listenSocket,`listener opening at ${this.settings.listeningPort}`)
         })
@@ -65,8 +81,11 @@ class Listener {
     }
     close() {
         if (this.listenerSocket === null) return false;
+        clearInterval(this.upgradeInterval);
         this.logger.debug("listener closing");
-        this.listenerSocket.close();
+        //this.listenerSocket.close();
+        this.sock && uWS.us_listen_socket_close(this.sock);
+        this.sock = null
         this.listenerSocket = null;
         return true;
     }
@@ -112,16 +131,35 @@ class Listener {
             }
         }
         this.logger.debug("client verification passed");
-        //response(true);
 
+        if (this.conn < this.CONN_THROTTLE) {
+            const newConnection = new Connection(this, socketData);
+            socketData.connection = newConnection
+            res.upgrade(socketData,
+                req.getHeader('sec-websocket-key'),
+                req.getHeader('sec-websocket-protocol'),
+                req.getHeader('sec-websocket-extensions'),
+            context);
+            this.conn++;
+        } else {
+            this.upgradeQueue.push([res,socketData,
+                req.getHeader('sec-websocket-key'),
+                req.getHeader('sec-websocket-protocol'),
+                req.getHeader('sec-websocket-extensions'),
+            context]);
+            res.onAborted(() => {
+                const index = this.upgradeQueue.findIndex(item => item[0] === res);
+                this.upgradeQueue.splice(index, 1);
+            });
+        }
 
-        const newConnection = new Connection(this, socketData);
+        /*const newConnection = new Connection(this, socketData);
         socketData.connection = newConnection
         res.upgrade(socketData,
             req.getHeader('sec-websocket-key'),
             req.getHeader('sec-websocket-protocol'),
             req.getHeader('sec-websocket-extensions'),
-        context);
+        context);*/
     }
     onOpen() {
         this.logger.inform(`listener open at ${this.settings.listeningPort}`);
