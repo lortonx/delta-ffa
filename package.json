@@ -22,5 +22,9 @@
     },
     "dependencies": {
         "uWebSockets.js": "github:uNetworking/uWebSockets.js#v19.2.0"
+    },
+    "engines": {
+        "node": "10.x",
+        "desc":"this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
     }
 }
