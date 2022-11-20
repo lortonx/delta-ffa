@@ -4,11 +4,72 @@
 
 const uWS = require('uWebSockets.js')
 const path = require('path')
-
+const net = require('net');
+const {WT} = require('./WT.js');
+// const wrtc = require('wrtc')
+const {Peer} = require('./microPeer.js')
+// console.log(wrtc)
 
 const Connection = require("./Connection");
 const ChatChannel = require("./ChatChannel");
 const { filterIPAddress } = require("../primitives/Misc");
+
+class ConnectionData{
+	/**
+	 * @param {uWS.HttpResponse} res 
+	 * @param {uWS.HttpRequest} req 
+	 */
+	constructor(res, req){
+		this.connectedTime = new Date().getTime()
+		/**@type {User}   */this.user = null
+		/**@type {String} */this.ip = req.getHeader('fly-client-ip')|| req.getHeader('x-forwarded-for').split(",")[0] || new Uint8Array(res.getRemoteAddress().slice(-4)).join('.')
+		/**@type {String} */this.url = req.getUrl()+'?'+req.getQuery()
+		/**@type {Object} */this.query = ((string)=>{let qu={};string.replace(/([^?=&]+)(=([^&]*))?/g, function(e,t,o,r){qu[t]=r}); return qu})(req.getQuery())
+		/**@type {String} */this.origin = req.getHeader('origin')
+		/**@type {String} */this.websocketKey = req.getHeader('sec-websocket-key')
+		/**@type {Object} */this.connector = null
+		this.remoteProxiedAddres = new TextDecoder().decode(res.getProxiedRemoteAddressAsText())
+		this.remoteAddress = new TextDecoder().decode(res.getRemoteAddressAsText())
+		this.headers = {
+			'accept-encoding': null,		//'gzip, deflate, br',
+			'accept-language': null,		//'tr,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+			'cache-control': null,		//'no-cache',
+			'connection': null,		//'Upgrade',
+			'host': null,		//'snez.org:8080',
+			'origin': null,		//'https://deltav4.gitlab.io',
+			'pragma': null,		//'no-cache',
+			'sec-websocket-extensions': null,		//'permessage-deflate; client_max_window_bits',
+			'sec-websocket-key': null,		//'Gtrj47DmRKJlDU3GTNVuyQ==',
+			'sec-websocket-protocol': null,		//'bearer',
+			'sec-websocket-version': null,		//'13',
+			'upgrade': null,		//'websocket',
+			'user-agent': null,		//'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36 Edg/97.0.1072.55'
+		}
+		this.hlist = []
+		// this.headers2 = {}
+		this.isDelta = false
+		this.readHeaders(req)
+		return this
+	}
+	/**
+	 * @param {uWS.HttpRequest} req 
+	 */
+	readHeaders(req){
+		req.forEach((key, value)=>{
+			this.hlist.push(key)
+			this.headers[key] = value
+		})
+
+	}
+	get isNode(){
+		const test = 'sec-websocket-'
+		if( this.hlist[0].indexOf(test)>-1 || this.hlist[1].indexOf(test)>-1) {
+			console.log('nodejs detected', this.ip)
+			return true
+		}
+		return false
+	}
+}
 
 class Listener {
     /**
@@ -57,26 +118,200 @@ class Listener {
         }).ws('/', {
             /* There are many common helper features */
             idleTimeout: 36000,
-            maxBackpressure: 1024,
-            maxPayloadLength: 512,
-            compression: uWS.DEDICATED_COMPRESSOR_4KB,
+            maxBackpressure: 51200,
+            maxPayloadLength: 51200,
+            /**@type {uWS} */
+            compression: uWS.SHARED_COMPRESSOR,
             upgrade: this.verifyClient.bind(this),
             open: this.onConnection.bind(this),
             message: (ws, message, isBinary) => {
                 ws.connection.onSocketMessage(message, isBinary)
             },
             close: (ws, code, message) => {
+                console.log(code, message, this.connectionsByIP)
                 ws.connection.onSocketClose(code, message)
-                console.log(this.connectionsByIP)
             }
             
         }).get('/ping',(res, req) => {
             res.end('pong!');
-        }).listen(this.settings.listeningPort, (listenSocket) => {
+        }).listen(8089, (listenSocket) => {
             this.sock = listenSocket
             if (listenSocket) this.logger.debug(`listener opening at ${this.settings.listeningPort}`);
             console.log(listenSocket,`listener opening at ${this.settings.listeningPort}`)
         })
+
+
+        var addrRegex = /^(([a-zA-Z\-\.0-9]+):)?(\d+)$/;
+        var addr = {
+            from: addrRegex.exec(''+this.settings.listeningPort),
+            to: addrRegex.exec('8089')
+        };
+        var netService = net.createServer(function(socket) {
+            console.log('socket connected');
+           
+            socket.on('data', data => {
+                // console.log('client=>server',/* data*/);
+            })
+            socket.on('close', () => {
+                socket.destroy()
+                console.log('client=>server CLOSE');
+            })
+            socket.on('error', err => {
+                socket.destroy()
+                console.log('client=>server ERROR'/*, err*/);
+            })
+
+            var to = net.createConnection({
+                host: addr.to[2],
+                port: addr.to[3]
+            });
+            socket.pipe(to);
+            to.pipe(socket);
+
+            var address = netService.address();
+            // console.log("Stream on", address, socket.address());
+            // console.log("opened server on", socket);
+            console.log('Started')
+
+            to.on('data', data => {
+                // console.log('server=>client'/*, data*/);
+            })
+            to.on('close', () => {
+                console.log('server=>client CLOSE');
+                to.destroy()
+            })
+            to.on('error', err => {
+                to.destroy()
+                console.log('server=>client ERROR'/*, err*/);
+            })
+        }).listen(addr.from[3], addr.from[2]);
+
+
+
+        /// WEBRTC
+
+        // const myPeer = new Peer({
+        //     id: Math.random(), 
+        //     info_hash: this.settings.serverName
+        // }, new WT('wss://tracker.openwebtorrent.com/?client_1'))
+
+        // myPeer.on('connect', (Web) => {
+        //     console.log('created')
+        //     const newConnection = new Connection(this, {ip:'127.0.0.1'});
+        //     Web.connection = newConnection
+
+        //     if(Web._channel._send){
+        //         const old_send = Web._channel.send.bind(Web._channel)
+        //         Web._channel.send = function(data){
+        //             if(this.readyState === "open") old_send(data)
+        //         }
+        //     }
+        //     Web.webSocket = {
+        //         connnection : Web,
+        //         send: (e)=>{
+        //             if(Web._channel.readyState === "open")  Web.send(e)
+        //         },
+        //         end: Web.destroy
+        //     }
+        //     this.onConnection(Web)
+
+        //     Web.on('data',(e)=>{
+        //         // console.log(e+'')
+        //         newConnection.onSocketMessage(e)
+        //     })
+
+        //     Web.on('close',()=>{
+        //         console.log('peer closed')
+        //         newConnection.onSocketClose('1006','Closed by RTCDataChannel')
+        //     })
+
+        
+        
+        // })
+        
+        
+        // myPeer.on('created',/** @param {WebRtcConnector} Web*/(Web) => {
+        //     // console.log('created',Web)
+        //     let listener
+        //     Web.on('datachannel',listener = /** @param {RTCDataChannel} ch*/ (ch)=>{
+        //         ch.binaryType = "arraybuffer";
+        //         const old_send = ch.send.bind(ch)
+        //         const newConnection = new Connection(this, {ip:'127.0.0.1'});
+        //         let isOpened = false
+        //         ch.onopen = ()=>{
+        //             // console.log('RTC ONOPEN ReADY STATE',ch.readyState)
+        //             if (ch.readyState == "open") {
+        //                 isOpened = true
+        //                 ch.connection = newConnection
+        //                 this.onConnection(ch)
+        //             }
+        //         }
+        //         ch.end = (code, reason)=>{
+        //             // console.log('RTC closed', code, reason)
+        //             newConnection.onSocketClose('1006','Closed by RTCDataChannel')
+        //             ch.close()
+        //         }
+        //         ch.send = (data, isBinary)=>{
+        //             if(/*isOpened && */ch.readyState !== "open") return ch.end()
+        //             ch.readyState == "open" && old_send(data)
+        //         }
+        //         ch.onmessage = (e)=>{
+        //             // на входе arraybuffer
+        //             newConnection.onSocketMessage(e.data)
+        //         }
+        //         // var i = 0
+        //         ch.onclose = ()=>{
+        //             isOpened = false
+        //             ch.end = ch.onopen = ch.onmessage = ch.onclose = ()=>{}
+        //             Web.removeListener('datachannel', listener)
+        //             newConnection.onSocketClose('1006','Closed by RTCDataChannel')
+        //         }
+        //         // setInterval(()=>{ch.readyState == 'open' && ch.send('Msg from: NODE '+(i++))},1000)
+        //     })
+        
+        //     // Web.on('connected',/** @param {WebRtcConnector} Web*/(Web) => {
+        //     //     console.log('Connected p2p')
+            
+        //     //     // Web.on('data', (data) => {
+        //     //     //     console.log('data', Web, data)
+        //     //     // })
+        //     //     Web.once('disconnected',()=>{
+        //     //         console.log('Disonnected p2p')
+        //     //     })
+        //     // })
+        
+        // })
+        
+        
+        
+        // myPeer.announce({
+        //     event:'started',
+        //     numwant:0,
+        //     // uploaded: 0,
+        //     // downloaded: 0,
+        //     // left: 0,
+        // })
+        // myPeer.on('announceinterval', () => {
+        //     myPeer.announce({
+        //         event:'stopped',
+        //         numwant: 0
+        //     })
+        //     setTimeout(()=>{
+        //         myPeer.announce({
+        //             event:'started',
+        //             numwant: 0
+        //         })
+        //     },300)
+
+        //     // myPeer.announce({
+        //     //     event:'started',
+        //     //     numwant:0,
+        //     //     // uploaded: 0,
+        //     //     // downloaded: 0,
+        //     //     // left: 0,
+        //     // })
+        // })
+        
 
         //this.listenerSocket.on("connection", this.onConnection.bind(this));
         return true;
@@ -97,14 +332,8 @@ class Listener {
      * @param {*} response
      */
     verifyClient(res, req, context) {
-        const connection_ip = new Uint8Array(res.getRemoteAddress().slice(-4)).join('.')
-        let socketData = {
-            connection: null,
-            ip: req.getHeader('fly-client-ip')|| req.getHeader('x-forwarded-for').split(",")[0] || connection_ip, //env : fly.io || glitch.com || others
-            url: req.getUrl()+'?'+req.getQuery(),
-            origin: req.getHeader('origin'),
-            websocketKey: req.getHeader('sec-websocket-key'),
-        }
+        let socketData = new ConnectionData(res, req)
+        console.log(socketData)
 
         const address = filterIPAddress(socketData.ip);
         this.logger.onAccess(`REQUEST FROM ${address}, Origin: ${socketData.origin}`);

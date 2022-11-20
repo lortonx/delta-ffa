@@ -8,6 +8,7 @@ const DefaultCommands = require("../src/commands/DefaultCommands");
 const DefaultProtocols = [
     require("../src/protocols/LegacyProtocol"),
     require("../src/protocols/ModernProtocol"),
+    require("../src/protocols/DeltaProtocol"),
 ];
 const DefaultGamemodes = [
     require("../src/gamemodes/FFA"),
@@ -135,3 +136,4 @@ setTimeout(() => {
     ask();
 }, 1000);
 currentHandle.start();
+

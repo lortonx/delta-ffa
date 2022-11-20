@@ -71,9 +71,11 @@ class PlayerCell extends Cell {
         const settings = this.world.settings;
         let delay = settings.playerNoMergeDelay;
         if (settings.playerMergeTime > 0) {
-            const initial = Math.round(25 * settings.playerMergeTime);
             const increase = Math.round(25 * this.size * settings.playerMergeTimeIncrease);
-            delay = Math.max(delay, settings.playerMergeVersion === "new" ? Math.max(initial, increase) : initial + increase);
+            const initial = Math.round(25 * settings.playerMergeTime);
+            delay = Math.max(delay, 
+                settings.playerMergeVersion === "new" ? Math.max(initial, increase) : initial + increase
+            );
         }
         this._canMerge = this.age >= delay;
     }

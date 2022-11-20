@@ -5,7 +5,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "start": "node cli/index.js",
-        "start2": "nodemon cli/index.js --ignore 'logs/*' --ignore settings.json --ignore log-settings.json"
+        "start2": "nodemon --inspect cli/index.js --ignore 'logs/*' --ignore settings.json --ignore log-settings.json"
     },
     "author": {
         "name": "Luka Djokovic",
@@ -21,10 +21,14 @@
         "url": "https://github.com/Luka967/OgarII/issues"
     },
     "dependencies": {
-        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v19.2.0"
+        "@mapbox/node-pre-gyp": "^1.0.8",
+        "simple-peer": "^9.11.0",
+        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.3.0",
+        "wrtc": "^0.4.7",
+        "ws": "^8.4.2"
     },
     "engines": {
-        "node": "10.x",
-        "desc":"this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
+        "node": "16.x",
+        "desc": "this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
     }
 }

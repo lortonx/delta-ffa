@@ -390,7 +390,7 @@ class World {
      * @param {Cell} b
      */
     resolveRigidCheck(a, b) {
-        /*let dx = b.x - a.x;
+        let dx = b.x - a.x;
         let dy = b.y - a.y;
         let d = Math.sqrt(dx * dx + dy * dy);
         const m = a.size + b.size - d;
@@ -408,33 +408,35 @@ class World {
         this.updateCell(a);
         this.updateCell(b);
         this.bounceCell(a);
-        this.bounceCell(b);*/
+        this.bounceCell(b);
         
         
 
-        let dx = b.x - a.x;
-        let dy = b.y - a.y;
-        let d = Math.sqrt(dx * dx + dy * dy);
-        var r = a.size + b.size; // radius sum of cell & check
-        var push = Math.min((r - d) / d, r - d); // min extrusion force
-        if (push / r < 0) return;
-        // body impulse
-        var ms = a.squareSize + b.squareSize;
-        //ms/=.5
-        //push*=1.9
-        ms/=.2
-        push*=3.9
-        var m1 = push * (b.squareSize / ms);
-        var m2 = push * (a.squareSize / ms);
-        // apply extrusion force
-        a.x -= dx * m1;
-        a.y -= dy * m1;
-        b.x += dx * m2;
-        b.y += dy * m2;
-        this.updateCell(a);
-        this.updateCell(b);
-        //this.bounceCell(a);
-        //this.bounceCell(b);
+        // let dx = b.x - a.x;
+        // let dy = b.y - a.y;
+        // let d = Math.sqrt(dx * dx + dy * dy);
+        // var r = a.size + b.size; // radius sum of cell & check
+        // var push = Math.min((r - d) / d, r - d); // min extrusion force
+        // if (push / r < 0) return;
+        // // body impulse
+        // var ms = a.squareSize + b.squareSize;
+        // //ms/=.5
+        // //push*=1.9
+        // ms/=.2
+        // push*=3.9
+        // var m1 = push * (b.squareSize / ms);
+        // var m2 = push * (a.squareSize / ms);
+        // // apply extrusion force
+        // a.x -= dx * m1;
+        // a.y -= dy * m1;
+        // b.x += dx * m2;
+        // b.y += dy * m2;
+        // this.updateCell(a);
+        // this.updateCell(b);
+
+
+        // this.bounceCell(a);
+        // this.bounceCell(b);
     }
 
     /**

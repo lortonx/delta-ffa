@@ -118,7 +118,8 @@ class LegacyProtocol extends Protocol {
                     this.onStatsRequest();
                 break;
             case 255: return void this.fail(1003, "Unexpected message");
-            default: return void this.fail(1003, "Unknown message type");
+            case 102:  break; // for encrypted connections
+            default: return void this.fail(1003, "Unknown message type "+ messageId);
         }
     }
 
@@ -254,18 +255,18 @@ class LegacyProtocol extends Protocol {
         l = del.length;
         writer[this.protocol < 6 ? "writeUInt32" : "writeUInt16"](l);
         for (i = 0; i < l; i++) writer.writeUInt32(del[i].id);
-        if(this.protocol === 22){
-            const sourceBuffer = writer.finalize()
-            const uncompressedSize = sourceBuffer.byteLength
-            const compressedSize = MiniLZ4.compress(sourceBuffer,BufferPool,5)
-            if(compressedSize === 0) return this.send(sourceBuffer);
-            const compressed = new DataView(BufferPool.slice(0,compressedSize+5).buffer)
-            compressed.setUint8(0,255)
-            compressed.setUint32(1,uncompressedSize,true)
-            this.send(compressed.buffer);
-        }else{
+        // if(this.protocol === 22){
+        //     const sourceBuffer = writer.finalize()
+        //     const uncompressedSize = sourceBuffer.byteLength
+        //     const compressedSize = MiniLZ4.compress(sourceBuffer,BufferPool,5)
+        //     if(compressedSize === 0) return this.send(sourceBuffer);
+        //     const compressed = new DataView(BufferPool.slice(0,compressedSize+5).buffer)
+        //     compressed.setUint8(0,255)
+        //     compressed.setUint32(1,uncompressedSize,true)
+        //     this.send(compressed.buffer);
+        // }else{
             this.send(writer.finalize());
-        }
+        // }
         
     }
 }
