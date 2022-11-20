@@ -77,7 +77,8 @@ class Connection extends Router {
         }
     }
     createPlayer() {
-        super.createPlayer();
+        const player = super.createPlayer();
+        this.protocol.onNewOwnPlayer(player.id)
         if (this.settings.chatEnabled)
             this.listener.globalChat.add(this);
         if (this.settings.matchmakerNeedsQueuing) {

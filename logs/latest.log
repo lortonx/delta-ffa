@@ -1,53 +1,53 @@
-2022-11-20 14:25:21.254 [INFO] starting
-2022-11-20 14:25:21.257 [DEBUG] listener opening at 8080
-2022-11-20 14:25:21.257 [DEBUG] listener opening at 8080
-2022-11-20 14:25:21.262 [INFO] ticker begin
-2022-11-20 14:25:21.262 [INFO] OgarII 1.3.6
-2022-11-20 14:25:21.263 [INFO] gamemode: FFA
-2022-11-20 14:25:21.498 [ACCESS] REQUEST FROM 127.0.0.1, Origin: https://agar.io
-2022-11-20 14:25:21.498 [DEBUG] client verification passed
-2022-11-20 14:25:21.499 [ACCESS] CONNECTION FROM 127.0.0.1
-2022-11-20 14:25:21.502 [DEBUG] added a player with id 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 2
-2022-11-20 14:25:21.525 [DEBUG] player 2 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 3
-2022-11-20 14:25:21.525 [DEBUG] player 3 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 4
-2022-11-20 14:25:21.525 [DEBUG] player 4 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 5
-2022-11-20 14:25:21.525 [DEBUG] player 5 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 6
-2022-11-20 14:25:21.525 [DEBUG] player 6 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 7
-2022-11-20 14:25:21.525 [DEBUG] player 7 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 8
-2022-11-20 14:25:21.525 [DEBUG] player 8 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 9
-2022-11-20 14:25:21.525 [DEBUG] player 9 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 10
-2022-11-20 14:25:21.525 [DEBUG] player 10 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 11
-2022-11-20 14:25:21.525 [DEBUG] player 11 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 12
-2022-11-20 14:25:21.525 [DEBUG] player 12 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 13
-2022-11-20 14:25:21.525 [DEBUG] player 13 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 14
-2022-11-20 14:25:21.525 [DEBUG] player 14 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 15
-2022-11-20 14:25:21.525 [DEBUG] player 15 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 16
-2022-11-20 14:25:21.525 [DEBUG] player 16 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 17
-2022-11-20 14:25:21.525 [DEBUG] player 17 has been added to world 1
-2022-11-20 14:25:21.525 [DEBUG] added a player with id 18
-2022-11-20 14:25:21.525 [DEBUG] player 18 has been added to world 1
-2022-11-20 14:25:21.526 [DEBUG] added a player with id 19
-2022-11-20 14:25:21.526 [DEBUG] player 19 has been added to world 1
-2022-11-20 14:25:21.526 [DEBUG] added a player with id 20
-2022-11-20 14:25:21.526 [DEBUG] player 20 has been added to world 1
-2022-11-20 14:25:21.526 [DEBUG] added a player with id 21
-2022-11-20 14:25:21.526 [DEBUG] player 21 has been added to world 1
-2022-11-20 14:25:21.526 [DEBUG] added a world with id 1
-2022-11-20 14:25:21.526 [DEBUG] player 1 has been added to world 1
-2022-11-20 14:25:22.255 [DEBUG] command stream open
+2022-11-20 21:15:14.747 [INFO] starting
+2022-11-20 21:15:14.749 [DEBUG] listener opening at 8080
+2022-11-20 21:15:14.750 [DEBUG] listener opening at 8080
+2022-11-20 21:15:14.753 [INFO] ticker begin
+2022-11-20 21:15:14.753 [INFO] OgarII 1.3.6
+2022-11-20 21:15:14.753 [INFO] gamemode: FFA
+2022-11-20 21:15:15.601 [ACCESS] REQUEST FROM 127.0.0.1, Origin: https://agar.io
+2022-11-20 21:15:15.602 [DEBUG] client verification passed
+2022-11-20 21:15:15.602 [ACCESS] CONNECTION FROM 127.0.0.1
+2022-11-20 21:15:15.615 [DEBUG] added a player with id 1
+2022-11-20 21:15:15.659 [DEBUG] added a player with id 2
+2022-11-20 21:15:15.660 [DEBUG] player 2 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 3
+2022-11-20 21:15:15.660 [DEBUG] player 3 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 4
+2022-11-20 21:15:15.660 [DEBUG] player 4 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 5
+2022-11-20 21:15:15.660 [DEBUG] player 5 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 6
+2022-11-20 21:15:15.660 [DEBUG] player 6 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 7
+2022-11-20 21:15:15.660 [DEBUG] player 7 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 8
+2022-11-20 21:15:15.660 [DEBUG] player 8 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 9
+2022-11-20 21:15:15.660 [DEBUG] player 9 has been added to world 1
+2022-11-20 21:15:15.660 [DEBUG] added a player with id 10
+2022-11-20 21:15:15.661 [DEBUG] player 10 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 11
+2022-11-20 21:15:15.661 [DEBUG] player 11 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 12
+2022-11-20 21:15:15.661 [DEBUG] player 12 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 13
+2022-11-20 21:15:15.661 [DEBUG] player 13 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 14
+2022-11-20 21:15:15.661 [DEBUG] player 14 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 15
+2022-11-20 21:15:15.661 [DEBUG] player 15 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 16
+2022-11-20 21:15:15.661 [DEBUG] player 16 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 17
+2022-11-20 21:15:15.661 [DEBUG] player 17 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 18
+2022-11-20 21:15:15.661 [DEBUG] player 18 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 19
+2022-11-20 21:15:15.661 [DEBUG] player 19 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 20
+2022-11-20 21:15:15.661 [DEBUG] player 20 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a player with id 21
+2022-11-20 21:15:15.661 [DEBUG] player 21 has been added to world 1
+2022-11-20 21:15:15.661 [DEBUG] added a world with id 1
+2022-11-20 21:15:15.662 [DEBUG] player 1 has been added to world 1
+2022-11-20 21:15:15.753 [DEBUG] command stream open

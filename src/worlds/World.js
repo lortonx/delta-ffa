@@ -261,6 +261,23 @@ class World {
         }
     }
 
+    /**
+     * 1. Reset all flags
+     * 2. Add new objects
+     * 3. Move boosting cells
+     * 4. Resolve eat, resolve pushing boosting cells
+     * 5. Player cells
+     *    - Move
+     *    - Decay
+     *    - Autosplits
+     *    - Bounce
+     *    - Update in quadtree
+     * 6. Resolve eat, pushing cells
+     * 7. Find largest player
+     * 8. Resolve inputs
+     * 
+     */
+
     liveUpdate() {
         this.handle.gamemode.onWorldTick(this);
 
@@ -272,10 +289,10 @@ class World {
         let i;
         /** @type {number} */
         let l;
-
+        // 1. Reset all flags
         for (i = 0, l = this.cells.length; i < l; i++)
             this.cells[i].onTick();
-
+        // 2. Add new objects
         while (this.pelletCount < this.settings.pelletCount) {
             const pos = this.getSafeSpawnPos(this.settings.pelletMinSize);
             this.addCell(new Pellet(this, this, pos.x, pos.y));
@@ -293,15 +310,15 @@ class World {
             const pos = this.getSafeSpawnPos(this.settings.mothercellSize);
             this.addCell(new Fuckercell(this, pos.x, pos.y));
         }
-
+        // 3. Move boosting cells
         for (i = 0, l = this.boostingCells.length; i < l;) {
             if (!this.boostCell(this.boostingCells[i])) l--;
             else i++;
         }
-
+        // 4. Resolve eat, resolve pushing boosting cells
         for (i = 0; i < l; i++) {
             const cell = this.boostingCells[i];
-            if (cell.type !== 2 && cell.type !== 3) continue;
+            if (cell.type !== 2 && cell.type !== 3) continue; 
             this.finder.search(cell.range, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
@@ -311,7 +328,7 @@ class World {
                 }
             });
         }
-
+        // 5. Player cells
         for (i = 0, l = this.playerCells.length; i < l; i++) {
             const cell = this.playerCells[i];
             this.movePlayerCell(cell);
@@ -320,7 +337,7 @@ class World {
             this.bounceCell(cell);
             this.updateCell(cell);
         }
-
+        // 6. Resolve eat, pushing cells
         for (i = 0, l = this.playerCells.length; i < l; i++) {
             const cell = this.playerCells[i];
             this.finder.search(cell.range, (other) => {
@@ -337,7 +354,7 @@ class World {
             this.resolveRigidCheck(rigid[i++], rigid[i++]);
         for (i = 0, l = eat.length; i < l;)
             this.resolveEatCheck(eat[i++], eat[i++]);
-
+        // 7. Find largest player
         this.largestPlayer = null;
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
@@ -345,6 +362,8 @@ class World {
                 this.largestPlayer = player;
         }
 
+        // 8. Resolve inputs
+        const maxTickPerEject = 1 / this.settings.playerEjectDelay;
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             player.checkExistence();
@@ -357,10 +376,29 @@ class World {
                 router.splitAttempts--;
             }
             const nextEjectTick = this.handle.tick - this.settings.playerEjectDelay;
-            if (router.ejectAttempts > 0 && nextEjectTick >= router.ejectTick) {
-                router.attemptEject();
-                router.ejectAttempts = 0;
+            if (router.ejectAttempts > 0/* && nextEjectTick >= router.ejectTick*/) {
+                const maxPerTick = ~~((nextEjectTick / router.ejectTick) / this.settings.playerEjectDelay);
+                let ejectAttempts = router.ejectAttempts > maxPerTick ? maxPerTick: router.ejectAttempts;
+                while(ejectAttempts--){
+                    router.attemptEject();
+                }
+                router.ejectAttempts = 0
                 router.ejectTick = this.handle.tick;
+            }
+            if (router.ejectMacroPressed) {
+                if(router.ejectMacroProcessed == false){
+                    router.ejectTick = this.handle.tick
+                    router.ejectMacroProcessed = true
+                }
+                const протикало_с_последнего_выброса = this.handle.tick - router.ejectTick
+                let maxEjectedPerTick = ~~(протикало_с_последнего_выброса * maxTickPerEject);//0.5 // пол тика в один выброс
+                if(maxEjectedPerTick>=1){
+                    while(maxEjectedPerTick--){
+                        router.attemptEject();
+                    }
+                    router.ejectTick = this.handle.tick;
+                }
+
             }
             if (router.isPressingQ) {
                 if (!router.hasProcessedQ)

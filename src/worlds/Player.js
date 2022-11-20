@@ -16,6 +16,9 @@ class Player {
         this.router = router;
         this.exists = true;
         
+        this.mouseX = 0
+        this.mouseY = 0
+
         /** @type {number} */
         this.extraDecayMult = 0
         /** @type {string} */

@@ -61,6 +61,11 @@ class Protocol {
     onWorldReset() { throw new Error("Must be implemented"); }
     /**
      * @abstract
+     * @param {number} player_id
+     */
+    onNewOwnPlayer(player_id) {}
+    /**
+     * @abstract
      * @param {LeaderboardType} type
      * @param {LeaderboardDataType[type][]} data
      * @param {LeaderboardDataType[type]=} selfData

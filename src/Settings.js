@@ -62,6 +62,7 @@ const value = /*Object.seal*/({
     virusMonotonePops: false,
 
     ejectedNoCollideDelay: 0,
+    ejectedNoCollision: false,
     ejectedSize: 38,
     ejectingLoss: 43,
     ejectDispersion: 0.3,

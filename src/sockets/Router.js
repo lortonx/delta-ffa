@@ -1,3 +1,4 @@
+// @ts-check
 /** @interface */
 class Router {
     /**
@@ -18,28 +19,34 @@ class Router {
         this.hasProcessedQ = false;
         this.splitAttempts = 0;
         this.ejectAttempts = 0;
+        this.ejectMacroPressed = false
+        this.ejectMacroProcessed = false
         this.ejectTick = listener.handle.tick;
 
         this.hasPlayer = false;
         /** @type {Player} */
         this.player = null;
+        /** @type {Object<number, Player>} */
+        this.playersById = {}
+        /** @type {Player[]} */
+        this.players = []
 
         this.listener.addRouter(this);
     }
 
     /** @abstract @returns {string} */
     static get type() { throw new Error("Must be overriden"); }
-    /** @returns {string} */
+    /** @returns {string} */ // @ts-ignore
     get type() { return this.constructor.type; }
 
     /** @abstract @returns {boolean} */
     static get isExternal() { throw new Error("Must be overriden"); }
-    /** @returns {boolean} */
+    /** @returns {boolean} */ // @ts-ignore
     get isExternal() { return this.constructor.isExternal; }
 
     /** @abstract @returns {boolean} */
     static get separateInTeams() { throw new Error("Must be overriden"); }
-    /** @returns {boolean} */
+    /** @returns {boolean} */ // @ts-ignore
     get separateInTeams() { return this.constructor.separateInTeams; }
 
     get handle() { return this.listener.handle; }
@@ -49,9 +56,13 @@ class Router {
     createPlayer() {
         if (this.hasPlayer) return;
         this.hasPlayer = true;
-        this.player = this.listener.handle.createPlayer(this);
+        const player = this.listener.handle.createPlayer(this);
+        this.player = player;
+        this.playersById[player.id] = player
+        this.players.push(player)
+        return player
     }
-    destroyPlayer() {
+    destroyPlayer() { // нигде не вызывается
         if (!this.hasPlayer) return;
         this.hasPlayer = false;
         this.listener.handle.removePlayer(this.player.id);

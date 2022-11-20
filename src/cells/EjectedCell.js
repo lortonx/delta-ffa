@@ -28,6 +28,7 @@ class EjectedCell extends Cell {
         if (other.type === 2) return other.getEjectedEatResult(false);
         if (other.type === 4) return 3;
         if (other.type === 3) {
+            if (this.world.settings.ejectedNoCollision) return 0
             if (!other.isBoosting) other.world.setCellAsBoosting(other);
             return 1;
         }

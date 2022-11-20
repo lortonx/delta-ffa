@@ -50,7 +50,7 @@ class DeltaProtocol extends Protocol {
             return;
         }
         switch (messageId) {
-            
+
             case 0:
                 this.connection.spawningName = readZTString(reader, this.protocol);
                 break;
@@ -58,20 +58,12 @@ class DeltaProtocol extends Protocol {
                 this.connection.requestingSpectate = true;
                 break;
             case 16:
-                switch (reader.length) {
-                    case 13:          
-                        this.connection.mouseX = reader.readInt32();
-                        this.connection.mouseY = reader.readInt32();
-                        break;
-                    case 9:
-                        this.connection.mouseX = reader.readInt16();
-                        this.connection.mouseY = reader.readInt16();
-                        break;
-                    case 21:
-                        this.connection.mouseX = ~~reader.readFloat64();
-                        this.connection.mouseY = ~~reader.readFloat64();
-                        break;
-                    default: return void this.fail(1003, "Unexpected message format");
+                if (reader.length == 11) {
+                    this.connection.mouseX = reader.readInt32();
+                    this.connection.mouseY = reader.readInt32();
+                    const playerId = reader.readInt16();
+                } else {
+                    return void this.fail(1003, "Unexpected message format");
                 }
                 break;
             case 17:
@@ -82,11 +74,19 @@ class DeltaProtocol extends Protocol {
                 break;
             case 18: this.connection.isPressingQ = true; break;
             case 19: this.connection.isPressingQ = this.hasProcessedQ = false; break;
+            case 20: {
+                const pid = reader.readUInt32()
+                const state = !!reader.readUInt8()
+                this.connection.ejectMacroPressed = state
+                if(state == false) {
+                    this.connection.ejectMacroProcessed = state
+                }
+            }; break;
             case 21:
-                if (this.connection.controllingMinions)
+                if (this.connection.controllingMinions){
                     for (let i = 0, l = this.connection.minions.length; i < l; i++)
                         this.connection.minions[i].ejectAttempts++;
-                else this.connection.ejectAttempts++;
+                } else this.connection.ejectAttempts++;
                 break;
             case 22:
                 if (!this.gotKey || !this.settings.minionEnableERTPControls) break;
@@ -118,7 +118,6 @@ class DeltaProtocol extends Protocol {
                     this.onStatsRequest();
                 break;
             case 255: return void this.fail(1003, "Unexpected message");
-            case 102:  break; // for encrypted connections
             default: return void this.fail(1003, "Unknown message type "+ messageId);
         }
     }
@@ -181,6 +180,15 @@ class DeltaProtocol extends Protocol {
         }
         this.send(writer.finalize());
     }
+    /**
+     * @param {number} player_id
+     */
+    onNewOwnPlayer(player_id) {
+        const writer = new Writer();
+        writer.writeUInt8(63);
+        writer.writeUInt32(player_id)
+        this.send(writer.finalize())
+    }
 
     onWorldReset() {
         const writer = new Writer();
@@ -234,31 +242,31 @@ class DeltaProtocol extends Protocol {
         const source = this.connection.player;
         const writer = new Writer();
         writer.writeUInt8(16);
+        writer.writeUInt16(add.length);
+        writer.writeUInt16(upd.length);
+        writer.writeUInt16(eat.length);
+        writer.writeUInt16(del.length);
         let i, l, cell;
 
-        l = eat.length;
-        writer.writeUInt16(l);
-        for (i = 0; i < l; i++) {
+        for (i = 0, l = add.length; i < l; i++) {
+            cell = add[i];
+            writeCellData11(writer, source, this.protocol, cell,
+                true, true, true, true, true, true);
+        }
+
+        for (i = 0, l = upd.length; i < l; i++) {
+            cell = upd[i];
+            writeCellData11(writer, source, this.protocol, cell,
+                false, cell.sizeChanged, cell.posChanged, cell.colorChanged, cell.nameChanged, cell.skinChanged);
+        }
+
+        for (i = 0, l = eat.length; i < l; i++) {
             cell = eat[i];
             writer.writeUInt32(cell.eatenBy.id);
             writer.writeUInt32(cell.id);
         }
 
-        for (i = 0, l = add.length; i < l; i++) {
-            cell = add[i];
-            writeCellData[this.protocol](writer, source, this.protocol, cell,
-                true, true, true, true, true, true);
-        }
-        for (i = 0, l = upd.length; i < l; i++) {
-            cell = upd[i];
-            writeCellData[this.protocol](writer, source, this.protocol, cell,
-                false, cell.sizeChanged, cell.posChanged, cell.colorChanged, cell.nameChanged, cell.skinChanged);
-        }
-        writer.writeUInt32(0);
-
-        l = del.length;
-        writer[this.protocol < 6 ? "writeUInt32" : "writeUInt16"](l);
-        for (i = 0; i < l; i++) writer.writeUInt32(del[i].id);
+        for (i = 0, l = del.length; i < l; i++) writer.writeUInt32(del[i].id);
         this.send(writer.finalize());
         
     }
@@ -341,20 +349,25 @@ const writeCellData = {
  * @param {Player} source
  * @param {number} protocol
  * @param {Cell} cell
- * @param {boolean} includeType
+ * @param {boolean} isAddedCell
  * @param {boolean} includeSize
  * @param {boolean} includePos
  * @param {boolean} includeColor
  * @param {boolean} includeName
  * @param {boolean} includeSkin
  */
-function writeCellData11(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin) {
+function writeCellData11(writer, source, protocol, cell, isAddedCell, includeSize, includePos, includeColor, includeName, includeSkin) {
     writer.writeUInt32(cell.id);
     writer.writeInt32(cell.x);
     writer.writeInt32(cell.y);
     writer.writeUInt16(cell.size);
-
     let flags = 0;
+    let ext_flags = 0;
+    if (isAddedCell) {
+        if(cell.type === 1) ext_flags |= 0x01
+        if(cell.type === 0) ext_flags |= 0x04
+        flags |= 128;
+    }
     if (cell.isSpiked) flags |= 0x01;
     if (includeColor) flags |= 0x02;
     if (includeSkin) flags |= 0x04;
@@ -362,13 +375,14 @@ function writeCellData11(writer, source, protocol, cell, includeType, includeSiz
     if (cell.isAgitated) flags |= 0x10;
     if (cell.type === 3) flags |= 0x20;
     if (cell.type === 3 && cell.owner !== source) flags |= 0x40;
-    if (includeType && cell.type === 1) flags |= 0x80;
     writer.writeUInt8(flags);
-    if (includeType && cell.type === 1) writer.writeUInt8(1);
+    if(isAddedCell) writer.writeUInt8(ext_flags);
 
     if (includeColor) writer.writeColor(cell.color);
     if (includeSkin) writer.writeZTStringUTF8(cell.skin);
     if (includeName) writer.writeZTStringUTF8(cell.name);
+
+    if (isAddedCell && ext_flags & 0x04) writer.writeUInt32(cell.owner.id);
 }
 
 /**
