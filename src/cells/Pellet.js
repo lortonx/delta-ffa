@@ -1,3 +1,4 @@
+// @ts-check
 const Misc = require("../primitives/Misc");
 const Cell = require("./Cell");
 
@@ -22,7 +23,6 @@ class Pellet extends Cell {
     get avoidWhenSpawning() { return false; }
 
     /**
-     * @param {Cell} other
      * @returns {CellEatResult}
      */
     getEatResult() { return 0; }

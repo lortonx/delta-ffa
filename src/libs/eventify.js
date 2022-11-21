@@ -1,3 +1,5 @@
+// @ts-check
+
 const window = global
 /* LIB : EVENTIFY */
 class Eventify{

@@ -1,3 +1,4 @@
+// @ts-check
 const Protocol = require("./Protocol");
 const Reader = require("../primitives/Reader");
 const Writer = require("../primitives/Writer");

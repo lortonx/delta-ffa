@@ -1,3 +1,4 @@
+// @ts-check
 const Router = require("./Router");
 const Reader = require("../primitives/Reader");
 const { filterIPAddress } = require("../primitives/Misc");
@@ -6,7 +7,7 @@ const { filterIPAddress } = require("../primitives/Misc");
 class Connection extends Router {
     /**
      * @param {Listener} listener
-     * @param {WebSocket} webSocket
+     * @param0 {WebSocket} webSocket
      */
     constructor(listener, socketData) {
         super(listener);
@@ -58,10 +59,11 @@ class Connection extends Router {
         this.socketDisconnected = true;
         this.closeCode = code;
         this.closeReason = reason;
+        console.log('close reason',reason)
     }
 
     /**
-     * @param {ArrayBuffer|string} data
+     * @param {ArrayBuffer} data
      */
     onSocketMessage(data) {
         if (data instanceof String) return void this.closeSocket(1003, "Unexpected message format");
@@ -78,7 +80,7 @@ class Connection extends Router {
     }
     createPlayer() {
         const player = super.createPlayer();
-        this.protocol.onNewOwnPlayer(player.id)
+        // this.protocol.onNewOwnPlayer(player.id)
         if (this.settings.chatEnabled)
             this.listener.globalChat.add(this);
         if (this.settings.matchmakerNeedsQueuing) {
@@ -151,7 +153,7 @@ class Connection extends Router {
         this.protocol.onVisibleCellUpdate(add, upd, eat, del);
     }
     onWorldSet() {
-        this.protocol.onNewWorldBounds(this.player.world.border, true, this.protocol);
+        this.protocol.onNewWorldBounds(this.player.world.border, true);
     }
     /** @param {PlayerCell} cell */
     onNewOwnedCell(cell) {
@@ -185,4 +187,5 @@ module.exports = Connection;
 //const WebSocket = require("uws");
 const Listener = require("./Listener");
 const Minion = require("../bots/Minion");
-const Protocol = require("../protocols/Protocol");
+const Protocol = require("../protocols/Protocol");const PlayerCell = require("../cells/PlayerCell");
+

@@ -1,9 +1,10 @@
-//const uWS = require('./uWebSockets.js-18.14.0/uws.js')
-//const WebSocket = require("ws");
+// @ts-check
+'use strict';
+// const uWS = require('./uWebSockets.js-18.14.0/uws.js')
+//const WebSocket = require("ws"); 
 //const WebSocketServer = WebSocket.Server;
 
-const uWS = require('uWebSockets.js')
-const path = require('path')
+const uWS = require('uWebSockets.js') 
 const net = require('net');
 const {WT} = require('./WT.js');
 // const wrtc = require('wrtc')
@@ -21,9 +22,10 @@ class ConnectionData{
 	 */
 	constructor(res, req){
 		this.connectedTime = new Date().getTime()
-		/**@type {User}   */this.user = null
+		/**@type {*}   */this.user = null
 		/**@type {String} */this.ip = req.getHeader('fly-client-ip')|| req.getHeader('x-forwarded-for').split(",")[0] || new Uint8Array(res.getRemoteAddress().slice(-4)).join('.')
 		/**@type {String} */this.url = req.getUrl()+'?'+req.getQuery()
+        // @ts-ignore
 		/**@type {Object} */this.query = ((string)=>{let qu={};string.replace(/([^?=&]+)(=([^&]*))?/g, function(e,t,o,r){qu[t]=r}); return qu})(req.getQuery())
 		/**@type {String} */this.origin = req.getHeader('origin')
 		/**@type {String} */this.websocketKey = req.getHeader('sec-websocket-key')
@@ -76,8 +78,9 @@ class Listener {
      * @param {ServerHandle} handle
      */
     constructor(handle) {
-        /** @type {WebSocketServer} */
+        /** @type {uWS.TemplatedApp} */
         this.listenerSocket = null;
+        /** @type {ServerHandle} */
         this.handle = handle;
         this.globalChat = new ChatChannel(this);
 
@@ -89,6 +92,7 @@ class Listener {
         this.connectionsByIP = {};
         /* Антиддос система */
         this.sock = null
+        /** @type {[uWS.HttpResponse, {socketData: ConnectionData, connection?: Connection}, string, string, string, uWS.us_socket_context_t][]} */
         this.upgradeQueue = []
         this.CONN_THROTTLE = 5;
         this.conn = 0
@@ -96,10 +100,9 @@ class Listener {
             this.conn = 0;
             if (!this.upgradeQueue.length) return;
             for (let i = Math.min(this.CONN_THROTTLE || 1, this.upgradeQueue.length); i > 0; i--) {
-                const [res, socketData, key, protocol, ext, context] = this.upgradeQueue.shift();
-                const newConnection = new Connection(this, socketData);
-                socketData.connection = newConnection
-                res.upgrade(socketData, key, protocol, ext, context);
+                const [res, u_data, key, protocol, ext, context] = this.upgradeQueue.shift();
+                u_data.connection = new Connection(this, u_data.socketData);
+                res.upgrade(u_data.socketData, key, protocol, ext, context);
             }
         }, 250);
     }
@@ -120,16 +123,18 @@ class Listener {
             idleTimeout: 36000,
             maxBackpressure: 51200,
             maxPayloadLength: 51200,
-            /**@type {uWS} */
             compression: uWS.SHARED_COMPRESSOR,
             upgrade: this.verifyClient.bind(this),
             open: this.onConnection.bind(this),
             message: (ws, message, isBinary) => {
                 ws.connection.onSocketMessage(message, isBinary)
             },
+            /** @param {uWS.WebSocket & {connection:import('./Connection')}} ws */ // @ts-ignore
             close: (ws, code, message) => {
                 console.log(code, message, this.connectionsByIP)
-                ws.connection.onSocketClose(code, message)
+                const decoder = new TextDecoder("utf-8");
+                const string = decoder.decode(message)
+                ws.connection.onSocketClose(code, string)
             }
             
         }).get('/ping',(res, req) => {
@@ -160,7 +165,7 @@ class Listener {
                 socket.destroy()
                 console.log('client=>server ERROR'/*, err*/);
             })
-
+            // @ts-ignore
             var to = net.createConnection({
                 host: addr.to[2],
                 port: addr.to[3]
@@ -184,6 +189,7 @@ class Listener {
                 to.destroy()
                 console.log('server=>client ERROR'/*, err*/);
             })
+            // @ts-ignore
         }).listen(addr.from[3], addr.from[2]);
 
 
@@ -328,56 +334,58 @@ class Listener {
     }
 
     /**
-     * @param {{req: any, origin: string}} info
-     * @param {*} response
+     * @param {uWS.HttpResponse} res 
+     * @param {uWS.HttpRequest} req 
+     * @param {uWS.us_socket_context_t} context 
      */
     verifyClient(res, req, context) {
         let socketData = new ConnectionData(res, req)
-        console.log(socketData)
 
         const address = filterIPAddress(socketData.ip);
         this.logger.onAccess(`REQUEST FROM ${address}, Origin: ${socketData.origin}`);
         if (this.connections.length > this.settings.listenerMaxConnections) {
             this.logger.debug("listenerMaxConnections reached, dropping new connections");
-            return res.end('', null, '\t')
-            return void response(false, 503, "Service Unavailable");
+            return res.end('Service Unavailable', true)
+            // return void response(false, 503, "Service Unavailable");
         }
         const acceptedOrigins = this.settings.listenerAcceptedOrigins;
         if (acceptedOrigins.length > 0 && acceptedOrigins.indexOf(socketData.origin) === -1) {
             this.logger.debug(`listenerAcceptedOrigins doesn't contain ${socketData.origin}`);
-            return res.end('', null, '\t')
-            return void response(false, 403, "Forbidden");
+            return res.end('Forbidden', true)
+            // return void response(false, 403, "Forbidden");
         }
         if (this.settings.listenerForbiddenIPs.indexOf(address) !== -1) {
             this.logger.debug(`listenerForbiddenIPs contains ${address}, dropping connection`);
-            return res.end('', null, '\t')
-            return void response(false, 403, "Forbidden");
+            return res.end('Forbidden', true)
+            // return void response(false, 403, "Forbidden");
         }
         if (this.settings.listenerMaxConnectionsPerIP > 0) {
             const count = this.connectionsByIP[address];
             if (count && count >= this.settings.listenerMaxConnectionsPerIP) {
                 this.logger.debug(`listenerMaxConnectionsPerIP reached for '${address}', dropping its new connections`);
-                return res.end('', null, '\t')
-                return void response(false, 403, "Forbidden");
+                return res.end('Forbidden', true)
+                // return void response(false, 403, "Forbidden");
             }
         }
         this.logger.debug("client verification passed");
 
         if (this.conn < this.CONN_THROTTLE) {
-            const newConnection = new Connection(this, socketData);
-            socketData.connection = newConnection
-            res.upgrade(socketData,
+            const connection = new Connection(this, socketData);
+            res.upgrade({socketData, connection},
                 req.getHeader('sec-websocket-key'),
                 req.getHeader('sec-websocket-protocol'),
                 req.getHeader('sec-websocket-extensions'),
             context);
             this.conn++;
         } else {
-            this.upgradeQueue.push([res,socketData,
+            this.upgradeQueue.push([
+                res,
+                {socketData},
                 req.getHeader('sec-websocket-key'),
                 req.getHeader('sec-websocket-protocol'),
                 req.getHeader('sec-websocket-extensions'),
-            context]);
+                context
+            ]);
             res.onAborted(() => {
                 const index = this.upgradeQueue.findIndex(item => item[0] === res);
                 this.upgradeQueue.splice(index, 1);
@@ -410,15 +418,15 @@ class Listener {
     }
 
     /**
-     * @param {WebSocket} webSocket
+     * @param {uWS.WebSocket & {connection: Connection, socketData: ConnectionData}} ws
      */
     onConnection(ws) {
-        const newConnection = ws.connection
+        const connection = ws.connection
         ws.connection.webSocket = ws
-        this.logger.onAccess(`CONNECTION FROM ${newConnection.remoteAddress}`);
-        this.connectionsByIP[newConnection.remoteAddress] =
-            this.connectionsByIP[newConnection.remoteAddress] + 1 || 1;
-        this.connections.push(newConnection);
+        this.logger.onAccess(`CONNECTION FROM ${connection.remoteAddress}`);
+        this.connectionsByIP[connection.remoteAddress] =
+            this.connectionsByIP[connection.remoteAddress] + 1 || 1;
+        this.connections.push(connection);
     }
 
     /**

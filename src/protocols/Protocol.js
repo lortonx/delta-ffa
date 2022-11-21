@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @abstract
  */
@@ -14,6 +15,7 @@ class Protocol {
      * @returns {string}
      */
     static get type() { throw new Error("Must be implemented"); }
+    // @ts-ignore
     get type() { return this.constructor.type; }
     /**
      * @abstract
@@ -51,10 +53,10 @@ class Protocol {
      */
     onNewOwnedCell(cell) { throw new Error("Must be implemented"); }
     /**
-     * @param {World} world
+     * @param {Rect} rect
      * @param {boolean} includeServerInfo
      */
-    onNewWorldBounds(world, includeServerInfo) { throw new Error("Must be implemented"); }
+    onNewWorldBounds(rect, includeServerInfo) { throw new Error("Must be implemented"); }
     /**
      * @abstract
      */
@@ -90,7 +92,7 @@ class Protocol {
      */
     send(data) { this.connection.send(data); }
     /**
-     * @param {number=} code
+     * @param {number|undefined} code
      * @param {string=} reason
      */
     fail(code, reason) {
@@ -103,4 +105,5 @@ module.exports = Protocol;
 const Reader = require("../primitives/Reader");
 const Cell = require("../cells/Cell");
 const PlayerCell = require("../cells/PlayerCell");
-const Connection = require("../sockets/Connection");
+const Connection = require("../sockets/Connection");const World = require("../worlds/World");
+

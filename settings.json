@@ -52,7 +52,7 @@
     "ejectedNoCollideDelay": 0,
     "ejectedNoCollision": true,
     "ejectedSize": 38,
-    "ejectingLoss": 43,
+    "ejectingLoss": 38,
     "ejectDispersion": 0.1,
     "ejectedCellBoost": 780,
     "mothercellSize": 149,

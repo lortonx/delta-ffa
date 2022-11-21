@@ -1,14 +1,16 @@
+// @ts-check
 const Router = require("../sockets/Router");
 const ServerHandle = require("../ServerHandle");
 const World = require("./World");
 const Cell = require("../cells/Cell");
 const PlayerCell = require("../cells/PlayerCell");
+const Connection = require("../sockets/Connection");
 
 class Player {
     /**
      * @param {ServerHandle} handle
      * @param {number} id
-     * @param {Router} router
+     * @param {Connection} router
      */
     constructor(handle, id, router) {
         this.handle = handle;

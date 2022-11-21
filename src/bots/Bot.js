@@ -1,3 +1,4 @@
+// @ts-check
 const Router = require("../sockets/Router");
 
 /**

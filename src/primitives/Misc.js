@@ -1,3 +1,4 @@
+// @ts-check
 const IPv4MappedValidate = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/;
 
 module.exports = {
@@ -12,12 +13,12 @@ module.exports = {
         }
     },
     /**
-     * @param {number=} color
+     * @param {{r:number,g:number,b:number}} color
      */
     grayscaleColor(color) {
         /** @type {number} */
         let weight;
-        if (color) weight = ~~(0.299 * (color & 0xFF) + 0.587 * ((color.g >> 8) & 0xFF) + 0.114 * (color.b >> 16));
+        if (color) weight = ~~(0.299 * (color.r & 0xFF) + 0.587 * ((color.g >> 8) & 0xFF) + 0.114 * (color.b >> 16));
         else weight = 0x7F + ~~(Math.random() * 0x80);
         return (weight << 16) | (weight << 8) | weight;
     },

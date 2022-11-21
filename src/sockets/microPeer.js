@@ -1,3 +1,4 @@
+// @ts-check
 const {WT} = require('./WT.js');
 const wrtc = require('wrtc');
 const SimplePeer = require('simple-peer')

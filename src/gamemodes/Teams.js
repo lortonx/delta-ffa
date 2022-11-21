@@ -1,3 +1,4 @@
+// @ts-check
 const Gamemode = require("./Gamemode");
 const Misc = require("../primitives/Misc");
 

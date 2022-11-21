@@ -1,3 +1,4 @@
+// @ts-check
 const Cell = require("./Cell");
 const Pellet = require("./Pellet");
 
@@ -71,7 +72,7 @@ class Mothercell extends Cell {
         this.size = Math.min(this.size, this.world.settings.mothercellMaxSize);
     }
     /**
-     * @param {Cell} cell
+     * @param {PlayerCell} cell
      */
     whenEatenBy(cell) {
         super.whenEatenBy(cell);
@@ -84,4 +85,5 @@ class Mothercell extends Cell {
 
 module.exports = Mothercell;
 
-const World = require("../worlds/World");
+const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+

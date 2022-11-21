@@ -1,3 +1,4 @@
+// @ts-check
 class Stopwatch {
     constructor() { }
     begin() {

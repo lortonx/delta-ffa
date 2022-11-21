@@ -1,3 +1,4 @@
+// @ts-check
 const Settings = require("./Settings");
 
 const { CommandList } = require("./commands/CommandList");
@@ -93,11 +94,11 @@ class ServerHandle {
         if (this.ticker.running)
             this.ticker.stop();
         for (let id in this.worlds)
-            this.removeWorld(id);
+            this.removeWorld(+id);
         for (let id in this.players)
-            this.removePlayer(id);
-        for (let i = 0, l = this.listener.routers; i < l; i++)
-            this.listener.routers[0].close();
+            this.removePlayer(+id);
+        for (let i = 0, l = this.listener.routers.length; i < l; i++)
+            this.listener.routers[i].close();
         this.gamemode.onHandleStop();
         this.listener.close();
 
@@ -141,6 +142,7 @@ class ServerHandle {
     createPlayer(router) {
         let id = 0;
         while (this.players.hasOwnProperty(++id)) ;
+        // @ts-ignore
         const newPlayer = new Player(this, id, router);
         this.players[id] = newPlayer;
         router.player = newPlayer;

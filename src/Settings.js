@@ -1,4 +1,5 @@
-const value = /*Object.seal*/({
+// @ts-check
+const value = /*Object.seal(*/{
     /** @type {IPAddress[]} */
     listenerForbiddenIPs: [],
     /** @type {string[]} */
@@ -108,6 +109,6 @@ const value = /*Object.seal*/({
     playerMergeTime: 30,
     playerMergeTimeIncrease: 0.02, // чем число больше, тем медленее стартуется соединение. эталон 0.2205
     playerDecayMult: 0.002014 //множитель худения. эталон 0.002014, для ffa внезапно 17-19
-});
+}/*);*/
 
 module.exports = value;

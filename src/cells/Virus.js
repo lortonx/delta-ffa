@@ -1,3 +1,4 @@
+// @ts-check
 const Cell = require("./Cell");
 
 class Virus extends Cell {
@@ -62,7 +63,7 @@ class Virus extends Cell {
     }
 
     /**
-     * @param {Cell} cell
+     * @param {PlayerCell} cell
      */
     whenEatenBy(cell) {
         super.whenEatenBy(cell);
@@ -76,4 +77,5 @@ class Virus extends Cell {
 
 module.exports = Virus;
 
-const World = require("../worlds/World");
+const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+

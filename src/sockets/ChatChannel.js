@@ -1,10 +1,14 @@
+// @ts-check
 const serverSource = {
     name: "Server",
     isServer: true,
     color: 0x3F3FC0
 };
 
-/** @param {Connection} connection */
+/** 
+ * @param {Connection} connection 
+ * @returns {ChatSource}
+*/
 function getSourceFromConnection(connection) {
     return {
         isServer: false,
@@ -15,7 +19,7 @@ function getSourceFromConnection(connection) {
 
 class ChatChannel {
     /**
-     * @param {Listener} listener
+     * @param {Listener|World} listener
      */
     constructor(listener) {
         this.listener = listener;
@@ -49,7 +53,7 @@ class ChatChannel {
         return false;
     }
     /**
-     * @param {Connection=} source
+     * @param {Connection|undefined} source
      * @param {string} message
      */
     broadcast(source, message) {
@@ -60,7 +64,7 @@ class ChatChannel {
             this.connections[i].protocol.onChatMessage(sourceInfo, message);
     }
     /**
-     * @param {Connection=} source
+     * @param {Connection|undefined} source
      * @param {Connection} recipient
      * @param {string} message
      */
@@ -75,4 +79,7 @@ class ChatChannel {
 module.exports = ChatChannel;
 
 const Listener = require("./Listener");
-const Connection = require("./Connection");
+const Connection = require("./Connection");const Router = require("./Router");
+const ServerHandle = require("../ServerHandle");
+const World = require("../worlds/World");
+

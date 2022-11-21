@@ -1,9 +1,12 @@
+// @ts-check
 const { intersects, fullyIntersects, getQuadIntersect, getQuadFullIntersect } = require("../primitives/Misc");
 
 /**
  * @template T
  * @typedef {T & { __root: QuadTree<T>, range: Rect }} QuadItem
- *
+ */
+
+/** 
  * @typedef {-1 | 0 | 1 | 2 | 3} DefiniteQuad
  */
 
@@ -35,12 +38,13 @@ class QuadTree {
         for (let i = 0, l = this.items.length; i < l; i++)
             delete this.items[i].__root;
         if (!this.hasSplit) return;
-        for (i = 0; i < 4; i++) this.branches[i].destroy();
+        for (let i = 0; i < 4; i++) this.branches[i].destroy();
     }
     /**
      * @param {QuadItem<T>} item
      */
     insert(item) {
+        /** @type {QuadTree<T>} */
         let quad = this;
         while (true) {
             if (!quad.hasSplit) break;
@@ -115,6 +119,7 @@ class QuadTree {
      * @private
      */
     merge() {
+        /** @type {QuadTree<T>} */
         let quad = this;
         while (quad != null) {
             if (!quad.hasSplit) { quad = quad.root; continue; }
@@ -166,7 +171,7 @@ class QuadTree {
         return false;
     }
 
-    /** @returns {QuadItem<T>[]} */
+    // /** @returns {QuadItem<T>[]} */
     getItemCount() {
         if (!this.hasSplit) return this.items.length;
         else return this.items.length +

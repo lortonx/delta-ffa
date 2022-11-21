@@ -1,5 +1,6 @@
 [![shield to Agar.io Private Servers guild](https://discordapp.com/api/guilds/407210435721560065/embed.png?style=shield)](https://discord.gg/XcKgShT)
 
+https://dev.to/azure/passing-structured-data-from-c-to-javascript-in-web-assembly-1i0p
 # OgarII
 
 Your friendly agar.io private server recreation.

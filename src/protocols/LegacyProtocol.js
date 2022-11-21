@@ -1,3 +1,4 @@
+// @ts-check
 const Protocol = require("./Protocol");
 const Reader = require("../primitives/Reader");
 const Writer = require("../primitives/Writer");
@@ -43,7 +44,7 @@ class LegacyProtocol extends Protocol {
         const messageId = reader.readUInt8();
         if (!this.gotKey) {
             if (messageId !== 255) return;
-            if (reader.length < 5) return void this.fail("Unexpected message format");
+            if (reader.length < 5) return void this.fail(1003, "Unexpected message format");
             this.gotKey = true;
             this.key = reader.readUInt32();
             this.connection.createPlayer();
@@ -130,6 +131,7 @@ class LegacyProtocol extends Protocol {
     onChatMessage(source, message) {
         const writer = new Writer();
         writer.writeUInt8(99);
+        // @ts-ignore
         writer.writeUInt8(source.isServer * 128);
         writer.writeColor(source.color);
         writeZTString(writer, source.name, this.protocol);
@@ -200,8 +202,11 @@ class LegacyProtocol extends Protocol {
         this.lastLeaderboardType = type;
         const writer = new Writer();
         switch (type) {
+            // @ts-ignore
             case "ffa": ffaLeaderboard[this.protocol](writer, data, selfData, this.protocol); break;
+            // @ts-ignore
             case "pie": pieLeaderboard[this.protocol](writer, data, selfData, this.protocol); break;
+            // @ts-ignore
             case "text": textBoard[this.protocol](writer, data, this.protocol); break;
         }
         this.send(writer.finalize());
@@ -274,7 +279,7 @@ class LegacyProtocol extends Protocol {
 module.exports = LegacyProtocol;
 
 /**
- * @type {{ [protocol: number]: (writer: Writer, data: LeaderboardDataType["pie"][], selfData: LeaderboardDataType["pie"], protocol: number) => void }}
+ * @type {{ [protocol: number]: (writer: Writer, data: LeaderboardDataType["pie"][], protocol: number, selfData?: LeaderboardDataType["pie"]) => void }}
  */
 const pieLeaderboard = {
     4: pieLeaderboard4,
@@ -301,10 +306,10 @@ const pieLeaderboard = {
 /**
  * @param {Writer} writer
  * @param {LeaderboardDataType["pie"][]} data
- * @param {LeaderboardDataType["pie"]=} selfData
  * @param {number} protocol
+ * @param {LeaderboardDataType["pie"]=} selfData
  */
-function pieLeaderboard4(writer, data, protocol) {
+function pieLeaderboard4(writer, data, protocol, selfData) {
     writer.writeUInt8(50);
     writer.writeUInt32(data.length);
     for (let i = 0, l = data.length; i < l; i++)
@@ -313,10 +318,10 @@ function pieLeaderboard4(writer, data, protocol) {
 /**
  * @param {Writer} writer
  * @param {LeaderboardDataType["pie"][]} data
- * @param {LeaderboardDataType["pie"]=} selfData
  * @param {number} protocol
+ * @param {LeaderboardDataType["pie"]=} selfData
  */
-function pieLeaderboard21(writer, data, protocol) {
+function pieLeaderboard21(writer, data, protocol, selfData) {
     writer.writeUInt8(50);
     writer.writeUInt32(data.length);
     for (let i = 0, l = data.length; i < l; i++) {
@@ -353,7 +358,7 @@ const ffaLeaderboard = {
 /**
  * @param {Writer} writer
  * @param {LeaderboardDataType["ffa"][]} data
- * @param {LeaderboardDataType["ffa"]=} selfData
+ * @param {LeaderboardDataType["ffa"]} selfData
  * @param {number} protocol
  */
 function ffaLeaderboard4(writer, data, selfData, protocol) {
@@ -370,7 +375,7 @@ function ffaLeaderboard4(writer, data, selfData, protocol) {
 /**
  * @param {Writer} writer
  * @param {LeaderboardDataType["ffa"][]} data
- * @param {LeaderboardDataType["ffa"]=} selfData
+ * @param {LeaderboardDataType["ffa"]} selfData
  * @param {number} protocol
  */
 function ffaLeaderboard11(writer, data, selfData, protocol) {
@@ -417,10 +422,10 @@ const textBoard = {
  * @param {number} protocol
  */
 function textBoard4(writer, data, protocol) {
-    writer.writeUInt8(48);
-    writer.writeUInt32(data.length);
-    for (let i = 0, l = data.length; i < l; i++)
-        writer.writeZTString(data[i], protocol);
+    // writer.writeUInt8(48);
+    // writer.writeUInt32(data.length);
+    // for (let i = 0, l = data.length; i < l; i++)
+    //     writer.writeZTString(data[i], protocol);
 }
 /**
  * @param {Writer} writer

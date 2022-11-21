@@ -1,3 +1,4 @@
+// @ts-check
 const Cell = require("./Cell");
 const Pellet = require("./Pellet");
 const Virus = require("./Virus");
@@ -86,7 +87,7 @@ class Fuckercell extends Cell {
         this.size = Math.min(this.size, this.world.settings.fuckercellMaxSize);
     }
     /**
-     * @param {Cell} cell
+     * @param {PlayerCell} cell
      */
     whenEatenBy(cell) {
         super.whenEatenBy(cell);
@@ -99,4 +100,5 @@ class Fuckercell extends Cell {
 
 module.exports = Fuckercell;
 
-const World = require("../worlds/World");
+const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+

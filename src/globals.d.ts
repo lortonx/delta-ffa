@@ -26,7 +26,7 @@ interface Spawner {
 
 interface ChatSource {
     name: string;
-    isServer: string;
+    isServer: boolean;
     color: number;
 }
 interface FFALeaderboardEntry {
@@ -62,7 +62,7 @@ interface GenCommandTable {
     rows: string[][];
 }
 
-declare type LogEventLevel = "DEBUG" | "ACCESS" | "INFO" | "WARN" | "ERROR" | "FATAL";
+declare type LogEventLevel = "DEBUG" | "ACCESS" | "INFO" | "WARN" | "ERROR" | "FATAL" | "PRINT" | "FILE";
 declare type LogEvent = (date: Date, level: LogEventLevel, message: string) => void;
 declare type LogMessageData = any[];
 

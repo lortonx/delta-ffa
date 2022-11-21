@@ -1,3 +1,4 @@
+// @ts-check
 const { Command, genCommand } = require("./CommandList");
 const { EOL } = require("os");
 const { inspect } = require("util");
@@ -58,7 +59,7 @@ function table(contents, eol) {
     return all;
 }
 /**
- * @param {SettingIdType} id
+ * @param {string} id
  */
 function splitSettingId(id) {
     let items = [], reg, i = 0;
@@ -112,7 +113,7 @@ function prettyTime(seconds) {
     if (hours === 24) return `1 day`;
     return `${days} day${days === 1 ? "" : "s"} ${hours % 24} hour${hours === 1 ? "" : "s"}`;
 }
-/** @param {number} seconds */
+/** @param {number} milliseconds */
 function shortPrettyTime(milliseconds) {
     let seconds = ~~(milliseconds / 1000);
     if (seconds < 1) return `${milliseconds}ms`;
@@ -268,10 +269,10 @@ module.exports = (commands, chatCommands) => {
                     rows: routers.map((v, i) => [
                         i.toString(),
                         v.type,
-                        v.type === "connection" ? v.remoteAddress : null,
-                        v.type === "connection" ? shortPrettyTime(Date.now() - v.connectTime) : null,
-                        v.type === "connection" ? shortPrettyTime(Date.now() - v.lastActivityTime) : null,
-                        v.protocol ? v.protocol.subtype : null,
+                        v.type === "connection" ? v['remoteAddress'] : null,
+                        v.type === "connection" ? shortPrettyTime(Date.now() - v['connectTime']) : null,
+                        v.type === "connection" ? shortPrettyTime(Date.now() - v['lastActivityTime']) : null,
+                        v['protocol'] ? v['protocol'].subtype : null,
                         v.hasPlayer ? v.player.id.toString() : null,
                     ])
                 }, EOL));
@@ -663,7 +664,8 @@ module.exports = (commands, chatCommands) => {
                 const id = getString(args, handle, 0, "IP address");
                 if (id === false)
                     return;
-                if (!IPvalidate.test(ip = id))
+                const ip = id
+                if (!IPvalidate.test(ip))
                     return void handle.logger.print("invalid IP address");
                 const index = handle.settings.listenerForbiddenIPs.indexOf(ip);
                 if (index === -1)

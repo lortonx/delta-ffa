@@ -1,3 +1,4 @@
+// @ts-check
 /** @abstract */
 class Gamemode {
     /** @param {ServerHandle} handle */

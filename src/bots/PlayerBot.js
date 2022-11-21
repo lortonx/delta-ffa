@@ -1,3 +1,4 @@
+// @ts-check
 const Bot = require("./Bot");
 
 class PlayerBot extends Bot {

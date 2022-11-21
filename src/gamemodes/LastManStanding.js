@@ -1,3 +1,4 @@
+// @ts-check
 const FFA = require("./FFA");
 
 class LastManStanding extends FFA {

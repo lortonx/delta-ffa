@@ -1,3 +1,4 @@
+// @ts-check
 class Ticker {
     /**
      * @param {number} step
@@ -25,7 +26,7 @@ class Ticker {
             throw new TypeError("given object isn't a function");
         const i = this.callbacks.indexOf(callback);
         if (i === -1) throw new Error("given function wasn't added");
-        this.callback.splice(i, 1);
+        this.callbacks.splice(i, 1);
         return this;
     }
     start() {

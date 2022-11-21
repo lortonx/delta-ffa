@@ -1,3 +1,4 @@
+// @ts-check
 const { throwIfBadNumber, throwIfBadOrNegativeNumber } = require("../primitives/Misc");
 
 /** @abstract */
@@ -11,6 +12,8 @@ class Cell {
      */
     constructor(world, x, y, size, color) {
         this.world = world;
+
+        this.__root = null
 
         this.id = world.nextCellId;
         this.birthTick = world.handle.tick;
@@ -112,6 +115,13 @@ class Cell {
      * @returns {CellEatResult}
      */
     getEatResult(other) {
+        throw new Error("Must be overriden");
+    }
+    /**
+     * @param {boolean} other
+     * @returns {CellEatResult}
+     */
+    getEjectedEatResult(other) {
         throw new Error("Must be overriden");
     }
 

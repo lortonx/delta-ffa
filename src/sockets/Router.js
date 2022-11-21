@@ -60,7 +60,6 @@ class Router {
         this.player = player;
         this.playersById[player.id] = player
         this.players.push(player)
-        return player
     }
     destroyPlayer() { // нигде не вызывается
         if (!this.hasPlayer) return;

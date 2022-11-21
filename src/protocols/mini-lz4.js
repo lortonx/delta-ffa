@@ -1,3 +1,4 @@
+// @ts-check
 /*
 MiniLZ4: Minimal LZ4 block decoding and encoding.
 

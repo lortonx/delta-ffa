@@ -1,3 +1,4 @@
+// @ts-check
 const Cell = require("./Cell");
 
 class EjectedCell extends Cell {

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @template T
  */
@@ -36,7 +37,7 @@ class CommandList {
     register(...commands) {
         for (let i = 0, l = commands.length; i < l; i++) {
             const command = commands[i];
-            if (this.list.hasOwnProperty(command)) throw new Error("command conflicts with another already registered one");
+            if (this.list.hasOwnProperty(String(command))) throw new Error("command conflicts with another already registered one");
             this.list[command.name] = command;
         }
     }
@@ -55,11 +56,12 @@ class CommandList {
 }
 
 module.exports = {
-    Command: Command,
-    CommandList: CommandList,
+    Command,
+    CommandList,
     /**
      * @template T
      * @param {{ args: string, desc: string, name: string, exec: (handle: ServerHandle, context: T, args: string[]) => void }} info
+     * @returns {Command}
      */
     genCommand(info) {
         return new Command(info.name, info.desc, info.args, info.exec);

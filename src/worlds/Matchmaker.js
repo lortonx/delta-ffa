@@ -1,3 +1,4 @@
+// @ts-check
 class Matchmaker {
     /**
      * @param {ServerHandle} handle

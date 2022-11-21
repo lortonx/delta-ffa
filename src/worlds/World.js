@@ -1,3 +1,4 @@
+// @ts-check
 const QuadTree = require("../primitives/QuadTree");
 
 const Minion = require("../bots/Minion");
@@ -11,7 +12,7 @@ const Fuckercell = require("../cells/Fuckercell");
 const Virus = require("../cells/Virus");
 const ChatChannel = require("../sockets/ChatChannel");
 
-const { fullyIntersects, SQRT_2 } = require("../primitives/Misc");
+const { fullyIntersects } = require("../primitives/Misc");
 
 /**
  * @implements {Spawner}
@@ -46,11 +47,11 @@ class World {
         this.players = [];
         /** @type {Player=} */
         this.largestPlayer = null;
-        this.worldChat = new ChatChannel(this.handle);
+        this.worldChat = new ChatChannel(this);
 
         /** @type {Rect} */
         this.border = { x: NaN, y: NaN, w: NaN, h: NaN };
-        /** @type {QuadTree<Cell>} */
+        /** @type {QuadTree<import("../primitives/QuadTree").QuadItem<Cell>>} */
         this.finder = null;
 
         /**
@@ -197,7 +198,7 @@ class World {
      * @param {Rect} range
      */
     isSafeSpawnPos(range) {
-        return !this.finder.containsAny(range, /** @param {Cell} other */ (item) => item.avoidWhenSpawning);
+        return !this.finder.containsAny(range, /** @param {Cell} item */ (item) => item.avoidWhenSpawning);
     }
     /**
      * @param {number} cellSize
