@@ -322,7 +322,8 @@ class World {
             if (cell.type !== 2 && cell.type !== 3) continue; 
             this.finder.search(cell.range, (other) => {
                 if (cell.id === other.id) return;
-                switch (cell.getEatResult(other)) {
+                const result = cell.getEatResult(other);
+                switch (result) {
                     case 1: rigid.push(cell, other); break;
                     case 2: eat.push(cell, other); break;
                     case 3: eat.push(other, cell); break;
@@ -343,7 +344,8 @@ class World {
             const cell = this.playerCells[i];
             this.finder.search(cell.range, (other) => {
                 if (cell.id === other.id) return;
-                switch (cell.getEatResult(other)) {
+                const result = cell.getEatResult(other);
+                switch (result) {
                     case 1: rigid.push(cell, other); break;
                     case 2: eat.push(cell, other); break;
                     case 3: eat.push(other, cell); break;
@@ -371,48 +373,48 @@ class World {
             if (!player.exists) { i--; l--; continue; }
             if (player.state === 1 && this.largestPlayer == null)
                 player.updateState(2);
-            const router = player.router;
-            for (let j = 0, k = this.settings.playerSplitCap; j < k && router.splitAttempts > 0; j++) {
-                router.attemptSplit();
-                router.splitAttempts--;
+            const router_pl = player.router;
+            for (let j = 0, k = this.settings.playerSplitCap; j < k && router_pl.splitAttempts > 0; j++) {
+                router_pl.attemptSplit();
+                router_pl.splitAttempts--;
             }
             const nextEjectTick = this.handle.tick - this.settings.playerEjectDelay;
-            if (router.ejectAttempts > 0/* && nextEjectTick >= router.ejectTick*/) {
-                const maxPerTick = ~~((nextEjectTick / router.ejectTick) / this.settings.playerEjectDelay);
-                let ejectAttempts = router.ejectAttempts > maxPerTick ? maxPerTick: router.ejectAttempts;
+            if (router_pl.ejectAttempts > 0/* && nextEjectTick >= router.ejectTick*/) {
+                const maxPerTick = ~~((nextEjectTick / router_pl.ejectTick) / this.settings.playerEjectDelay);
+                let ejectAttempts = router_pl.ejectAttempts > maxPerTick ? maxPerTick: router_pl.ejectAttempts;
                 while(ejectAttempts--){
-                    router.attemptEject();
+                    router_pl.attemptEject();
                 }
-                router.ejectAttempts = 0
-                router.ejectTick = this.handle.tick;
+                router_pl.ejectAttempts = 0
+                router_pl.ejectTick = this.handle.tick;
             }
-            if (router.ejectMacroPressed) {
-                if(router.ejectMacroProcessed == false){
-                    router.ejectTick = this.handle.tick
-                    router.ejectMacroProcessed = true
+            if (router_pl.ejectMacroPressed) {
+                if(router_pl.ejectMacroProcessed == false){
+                    router_pl.ejectTick = this.handle.tick
+                    router_pl.ejectMacroProcessed = true
                 }
-                const протикало_с_последнего_выброса = this.handle.tick - router.ejectTick
+                const протикало_с_последнего_выброса = this.handle.tick - router_pl.ejectTick
                 let maxEjectedPerTick = ~~(протикало_с_последнего_выброса * maxTickPerEject);//0.5 // пол тика в один выброс
                 if(maxEjectedPerTick>=1){
                     while(maxEjectedPerTick--){
-                        router.attemptEject();
+                        router_pl.attemptEject();
                     }
-                    router.ejectTick = this.handle.tick;
+                    router_pl.ejectTick = this.handle.tick;
                 }
 
             }
-            if (router.isPressingQ) {
-                if (!router.hasProcessedQ)
-                    router.onQPress();
-                router.hasProcessedQ = true;
-            } else router.hasProcessedQ = false;
-            if (router.requestingSpectate) {
-                router.onSpectateRequest();
-                router.requestingSpectate = false;
+            if (router_pl.isPressingQ) {
+                if (!router_pl.hasProcessedQ)
+                    router_pl.onQPress();
+                router_pl.hasProcessedQ = true;
+            } else router_pl.hasProcessedQ = false;
+            if (router_pl.requestingSpectate) {
+                router_pl.onSpectateRequest();
+                router_pl.requestingSpectate = false;
             }
-            if (router.spawningName !== null) {
-                router.onSpawnRequest();
-                router.spawningName = null;
+            if (router_pl.spawningName !== null) {
+                router_pl.onSpawnRequest();
+                router_pl.spawningName = null;
             }
             player.updateViewArea();
         }

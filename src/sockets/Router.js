@@ -23,7 +23,7 @@ class Router {
         this.ejectTick = listener.handle.tick;
 
         this.hasPlayer = 0;
-        /** @type {Player} */
+        /** @type {Player} default player */
         this.player = null;
         // /** @type {Object<number, Player>} собственные игроки по индексу */
         // this.playersById = {}
@@ -57,7 +57,7 @@ class Router {
         // if (this.hasPlayer) return;
         this.hasPlayer ++;
         const player = this.listener.handle.createPlayer(this);
-        this.player = player;
+        if(!this.player) this.player = player
         this.players.set(player.id, player)
     }
     destroyPlayer() { // нигде не вызывается
@@ -65,7 +65,7 @@ class Router {
         for (const [id, player] of this.players) {
             this.hasPlayer --;
             this.listener.handle.removePlayer(player.id);
-            this.player = null;
+            if(player.id == this.player.id) this.player = null;
         }
     }
 
