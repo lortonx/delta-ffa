@@ -50,3 +50,12 @@ Your friendly agar.io private server recreation.
 - To create your own gamemodes, inherit `src/Gamemode.js`'s `Gamemode` abstract class, modify event handling to your wish, then add it with `ServerHandle.gamemodes.register` before the handle starts.
 
 - The `ServerHandle` class is standalone, which means that you can completely ditch the `cli/` folder, `require("./src/ServerHandle.js")` and do whatever you want with it. OgarII is also available as an npm package for this exact purpose.
+
+https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
+https://github.com/elliotdelano/dev-lib/blob/6bf06668060258ad19f6ff147ae309260683b671/core.js#L347
+https://github.com/gerazo/loose_quadtree/tree/master/src/include
+https://github.com/Appleguysnake/DragonSpace-Demo/blob/master/Assets/Scripts/DragonSpace/Quadtrees/LooseQuadtreeT.cs
+https://github.com/CAntol/Loose-Quadtree/blob/6548a634e2fda3379c27a6e9c337e065b221212e/loosequadtree.c
+
+https://github.com/sirisacademic/jassa-core-es6/blob/6fd56c081e52fe5fbdbc47be82fc18224690acab/src/geo/QuadTree.js
+https://github.com/GeoKnow/Jassa/blob/5617360466d74148d76808352936d1d47d4c4f14/jassa-js/src/main/webapp/resources/js/geo/quad-tree.js

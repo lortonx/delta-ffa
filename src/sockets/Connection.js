@@ -2,17 +2,21 @@
 const Router = require("./Router");
 const Reader = require("../primitives/Reader");
 const { filterIPAddress } = require("../primitives/Misc");
+const uWS = require('uWebSockets.js') 
 
-
+/**
+ * Конект вебсокет
+ */
 class Connection extends Router {
     /**
      * @param {Listener} listener
-     * @param0 {WebSocket} webSocket
+     * @param {ConnectionData} socketData
      */
     constructor(listener, socketData) {
         super(listener);
         this.remoteAddress = filterIPAddress(socketData.ip);
-        this.webSocket = null//webSocket;
+        /** @type {uWS.WebSocket} */
+        this.webSocket = null
         this.connectTime = Date.now();
         this.lastActivityTime = Date.now();
         this.lastChatTime = Date.now();
@@ -79,7 +83,8 @@ class Connection extends Router {
         }
     }
     createPlayer() {
-        const player = super.createPlayer();
+        super.createPlayer();
+        super.createPlayer();
         // this.protocol.onNewOwnPlayer(player.id)
         if (this.settings.chatEnabled)
             this.listener.globalChat.add(this);
@@ -187,5 +192,7 @@ module.exports = Connection;
 //const WebSocket = require("uws");
 const Listener = require("./Listener");
 const Minion = require("../bots/Minion");
-const Protocol = require("../protocols/Protocol");const PlayerCell = require("../cells/PlayerCell");
+const Protocol = require("../protocols/Protocol");
+const PlayerCell = require("../cells/PlayerCell");
+const ConnectionData = require("./ConnectionData");
 

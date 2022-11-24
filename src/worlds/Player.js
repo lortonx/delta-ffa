@@ -6,6 +6,9 @@ const Cell = require("../cells/Cell");
 const PlayerCell = require("../cells/PlayerCell");
 const Connection = require("../sockets/Connection");
 
+/**
+ * Всё что связано с единичным игроком
+ */
 class Player {
     /**
      * @param {ServerHandle} handle
@@ -84,7 +87,7 @@ class Player {
         let s;
         switch (this.state) {
             case -1: this.score = NaN; break;
-            case 0:
+            case 0: // playing
                 let x = 0, y = 0, score = 0; s = 0;
                 const l = this.ownedCells.length;
                 for (let i = 0; i < l; i++) {
@@ -101,7 +104,7 @@ class Player {
                 this.viewArea.w = 1024 / s / 2 * this.settings.playerViewScaleMult;
                 this.viewArea.h = 600 / s / 2 * this.settings.playerViewScaleMult;
                 break;
-            case 1:
+            case 1: // spectating
                 this.score = NaN;
                 const spectating = this.world.largestPlayer;
                 this.viewArea.x = spectating.viewArea.x;
@@ -110,7 +113,7 @@ class Player {
                 this.viewArea.w = spectating.viewArea.w;
                 this.viewArea.h = spectating.viewArea.h;
                 break;
-            case 2:
+            case 2: // roaming
                 this.score = NaN;
                 let dx = this.router.mouseX - this.viewArea.x;
                 let dy = this.router.mouseY - this.viewArea.y;
@@ -137,6 +140,9 @@ class Player {
             visibleCells[cell.id] = cell;
         }
         this.world.finder.search(this.viewArea, (cell) => visibleCells[cell.id] = cell);
+
+        // check last visible in bounds
+        // calculate 
     }
 
     checkExistence() {

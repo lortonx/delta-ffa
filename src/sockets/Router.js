@@ -1,5 +1,4 @@
 // @ts-check
-/** @interface */
 class Router {
     /**
      * @param {Listener} listener
@@ -23,13 +22,13 @@ class Router {
         this.ejectMacroProcessed = false
         this.ejectTick = listener.handle.tick;
 
-        this.hasPlayer = false;
+        this.hasPlayer = 0;
         /** @type {Player} */
         this.player = null;
-        /** @type {Object<number, Player>} */
-        this.playersById = {}
-        /** @type {Player[]} */
-        this.players = []
+        // /** @type {Object<number, Player>} собственные игроки по индексу */
+        // this.playersById = {}
+        /** @type {Map<number, Player>} собственные игроки*/ 
+        this.players = new Map()
 
         this.listener.addRouter(this);
     }
@@ -54,18 +53,20 @@ class Router {
     get settings() { return this.listener.handle.settings; }
 
     createPlayer() {
-        if (this.hasPlayer) return;
-        this.hasPlayer = true;
+        // нужно проверять да бы не вызывалось несколько раз
+        // if (this.hasPlayer) return;
+        this.hasPlayer ++;
         const player = this.listener.handle.createPlayer(this);
         this.player = player;
-        this.playersById[player.id] = player
-        this.players.push(player)
+        this.players.set(player.id, player)
     }
     destroyPlayer() { // нигде не вызывается
-        if (!this.hasPlayer) return;
-        this.hasPlayer = false;
-        this.listener.handle.removePlayer(this.player.id);
-        this.player = null;
+        // if (!this.hasPlayer) return;
+        for (const [id, player] of this.players) {
+            this.hasPlayer --;
+            this.listener.handle.removePlayer(player.id);
+            this.player = null;
+        }
     }
 
     /** @virtual */

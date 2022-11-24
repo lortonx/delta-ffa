@@ -1,8 +1,37 @@
 // @ts-check
 const { throwIfBadNumber, throwIfBadOrNegativeNumber } = require("../primitives/Misc");
 
+const BITS = {
+    posChanged: 0x0001,
+    sizeChanged: 0x0002,
+    colorChanged: 0x0004,
+    nameChanged: 0x0008,
+    skinChanged: 0x0010,
+    unused_6: 0x0020,
+    unused_7: 0x0040,
+    unused_8: 0x0080,
+    unused_9: 0x0100,
+    unused_10: 0x0200,
+    unused_11: 0x0400,
+    unused_12: 0x0800,
+    unused_13: 0x1000,
+    set: (
+        /** @type {number} */ current, 
+        /** @type {number} */ bit, 
+        /** @type {boolean|number} */ state
+    ) => state? (current |= bit) : (current &=~ bit)
+}
+
 /** @abstract */
 class Cell {
+    static types = {
+        player: 0,
+        pellet: 1,
+        virus: 2,
+        ejected: 3,
+        fuckercell: 4,
+        mothercell: 4,
+    }
     /**
      * @param {World} world
      * @param {number} x
@@ -12,7 +41,7 @@ class Cell {
      */
     constructor(world, x, y, size, color) {
         this.world = world;
-
+        /**@type {QuadTree<import("../primitives/QuadTree").QuadItem<Cell>>} */
         this.__root = null
 
         this.id = world.nextCellId;
@@ -23,6 +52,7 @@ class Cell {
         /** @type {Rect} */
         this.range = null;
         this.isBoosting = false;
+        this._canMerge = false
         /** @type {Boost} */
         this.boost = {
             dx: 0,
@@ -41,15 +71,38 @@ class Cell {
         this.color = color;
         this.name = null;
         this.skin = null;
-
-        this.posChanged =
-            this.sizeChanged =
-            this.colorChanged =
-            this.nameChanged =
-            this.skinChanged =
-            false;
+        
+        this.changes = 0x0000
+        // this.posChanged =
+        //     this.sizeChanged =
+        //     this.colorChanged =
+        //     this.nameChanged =
+        //     this.skinChanged =
+        //     false;
     }
+    // @ts-ignore
+    get posChanged(){return this.changes & BITS.posChanged}
+    /** @param {boolean} state */
+    set posChanged(state) { this.changes = BITS.set(this.changes, BITS.posChanged, state) }
+    // @ts-ignore
+    get sizeChanged(){return this.changes & BITS.sizeChanged}
+    /** @param {boolean} state */
+    set sizeChanged(state){this.changes = BITS.set(this.changes, BITS.sizeChanged, state) }
+    // @ts-ignore
+    get colorChanged(){return this.changes & BITS.colorChanged}
+    /** @param {boolean} state */
+    set colorChanged(state){this.changes = BITS.set(this.changes, BITS.colorChanged, state) }
+    // @ts-ignore
+    get nameChanged(){return this.changes & BITS.nameChanged}
+    /** @param {boolean} state */
+    set nameChanged(state){this.changes = BITS.set(this.changes, BITS.nameChanged, state) }
+    // @ts-ignore
+    get skinChanged(){return this.changes & BITS.skinChanged}
+    /** @param {boolean} state */
+    set skinChanged(state){this.changes = BITS.set(this.changes, BITS.skinChanged, state) }
 
+
+    get canMerge() { return this._canMerge; }
     /**
      * @abstract
      * @returns {number}
@@ -133,12 +186,13 @@ class Cell {
      * @virtual
      */
     onTick() {
-        this.posChanged =
-            this.sizeChanged =
-            this.colorChanged =
-            this.nameChanged =
-            this.skinChanged =
-            false;
+        this.changes = 0
+        // this.posChanged =
+        //     this.sizeChanged =
+        //     this.colorChanged =
+        //     this.nameChanged =
+        //     this.skinChanged =
+        //     false;
     }
     /**
      * @param {Cell} other
@@ -164,3 +218,5 @@ module.exports = Cell;
 
 const World = require("../worlds/World");
 const Player = require("../worlds/Player");
+const QuadTree = require("../primitives/QuadTree");
+

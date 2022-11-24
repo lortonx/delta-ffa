@@ -18,7 +18,7 @@ class Fuckercell extends Cell {
         this.passivePelletFormQueue = 0;
     }
 
-    get type() { return 4; }
+    get type() { return Cell.types.fuckercell; }
     get isSpiked() { return true; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return true; }

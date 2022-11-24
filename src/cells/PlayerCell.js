@@ -7,23 +7,20 @@ class PlayerCell extends Cell {
      * @param {number} x
      * @param {number} y
      * @param {number} size
-     * @param {number} color
      */
     constructor(owner, x, y, size) {
         super(owner.world, x, y, size, owner.cellColor);
         this.owner = owner;
         this.name = owner.cellName || "";
         this.skin = owner.cellSkin || "";
-        this._canMerge = false;
         this.SPIKED = false
     }
 
     get moveSpeed() {
         return 88 * Math.pow(this.size, -0.4396754) * this.owner.settings.playerMoveMult;
     }
-    get canMerge() { return this._canMerge; }
 
-    get type() { return 0; }
+    get type() { return Cell.types.player; }
     get isSpiked() { return this.SPIKED; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return true; }
@@ -33,7 +30,7 @@ class PlayerCell extends Cell {
      * @returns {CellEatResult}
      */
     getEatResult(other) { 
-        if (other.type === 0) {
+        if (other.type === Cell.types.player) {
             const delay = this.world.settings.playerNoCollideDelay;
             if (other.owner.id === this.owner.id) {
                 if (other.age < delay || this.age < delay) return 0;
@@ -44,9 +41,9 @@ class PlayerCell extends Cell {
                 return (other.age < delay || this.age < delay) ? 0 : 1;
             return this.getDefaultEatResult(other);
         }
-        if (other.type === 4 && other.size > this.size * this.world.settings.worldEatMult) return 3;
-        if (other.type === 1) return 2;
-        if (other.type === 3) {
+        if (other.type === Cell.types.mothercell && other.size > this.size * this.world.settings.worldEatMult) return 3;
+        if (other.type === Cell.types.pellet) return 2;
+        if (other.type === Cell.types.ejected) {
             if(other.cellEjector.id === this.id && other.age < this.world.settings.ejectedNoCollideDelay ||
                  other.cellEjector.owner.id === this.owner.id && other.age < 1) return 0
         }

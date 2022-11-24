@@ -15,7 +15,7 @@ class Virus extends Cell {
         this.splitAngle = NaN;
     }
 
-    get type() { return 2; }
+    get type() { return Cell.types.virus; }
     get isSpiked() { return true; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return true; }
@@ -25,8 +25,8 @@ class Virus extends Cell {
      * @returns {CellEatResult}
      */
     getEatResult(other) {
-        if (other.type === 3) return this.getEjectedEatResult(true);
-        if (other.type === 4) return 3;
+        if (other.type === Cell.types.ejected) return this.getEjectedEatResult(true);
+        if (other.type === Cell.types.mothercell) return 3;
         return 0;
     }
     /**

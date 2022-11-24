@@ -18,7 +18,7 @@ class Mothercell extends Cell {
         this.passivePelletFormQueue = 0;
     }
 
-    get type() { return 4; }
+    get type() { return Cell.types.mothercell; }
     get isSpiked() { return true; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return true; }

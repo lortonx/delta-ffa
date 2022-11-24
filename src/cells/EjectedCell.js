@@ -16,7 +16,7 @@ class EjectedCell extends Cell {
         this.cellEjector = cellEjector
     }
 
-    get type() { return 3; }
+    get type() { return Cell.types.ejected; }
     get isSpiked() { return false; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return false; }
@@ -28,7 +28,7 @@ class EjectedCell extends Cell {
     getEatResult(other) {
         if (other.type === 2) return other.getEjectedEatResult(false);
         if (other.type === 4) return 3;
-        if (other.type === 3) {
+        if (other.type === Cell.types.ejected) {
             if (this.world.settings.ejectedNoCollision) return 0
             if (!other.isBoosting) other.world.setCellAsBoosting(other);
             return 1;

@@ -74,7 +74,7 @@ class World {
 
     get settings() { return this.handle.settings; }
     get nextCellId() {
-        return this._nextCellId >= 4294967296 ? (this._nextCellId = 1) : this._nextCellId++;
+        return this._nextCellId >= 0xFFFFFFFF ? (this._nextCellId = 1) : this._nextCellId++;
     }
 
     afterCreation() {

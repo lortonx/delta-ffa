@@ -17,7 +17,7 @@ class Pellet extends Cell {
         this.lastGrowTick = this.birthTick;
     }
 
-    get type() { return 1; }
+    get type() { return Cell.types.pellet; }
     get isSpiked() { return false; }
     get isAgitated() { return false; }
     get avoidWhenSpawning() { return false; }
