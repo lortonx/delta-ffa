@@ -1,19 +1,17 @@
 // @ts-check
-const Settings = require("./Settings");
+import { CommandList } from "./commands/CommandList";
+import GamemodeList from "./gamemodes/GamemodeList";
+import Logger from "./primitives/Logger";
+import { version } from "./primitives/Misc";
+import Stopwatch from "./primitives/Stopwatch";
+import Ticker from "./primitives/Ticker";
+import ProtocolStore from "./protocols/ProtocolStore";
+import Settings from "./Settings";
+import Listener from "./sockets/Listener";
+import Matchmaker from "./worlds/Matchmaker";
+import Player from "./worlds/Player";
+import World from "./worlds/World";
 
-const { CommandList } = require("./commands/CommandList");
-const GamemodeList = require("./gamemodes/GamemodeList");
-const ProtocolStore = require("./protocols/ProtocolStore");
-
-const Stopwatch = require("./primitives/Stopwatch");
-const Logger = require("./primitives/Logger");
-const Ticker = require("./primitives/Ticker");
-const { version } = require("./primitives/Misc");
-
-const Listener = require("./sockets/Listener");
-const Matchmaker = require("./worlds/Matchmaker");
-const Player = require("./worlds/Player");
-const World = require("./worlds/World");
 
 class ServerHandle {
     /**
@@ -180,7 +178,7 @@ class ServerHandle {
     }
 }
 
-module.exports = ServerHandle;
+export default ServerHandle;
 
-const Router = require("./sockets/Router");
-const Gamemode = require("./gamemodes/Gamemode");
+import Gamemode from "./gamemodes/Gamemode";
+import Router from "./sockets/Router";

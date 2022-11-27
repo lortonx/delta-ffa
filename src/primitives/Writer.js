@@ -118,4 +118,4 @@ class Writer {
     }
 }
 
-module.exports = Writer;
+export default Writer;

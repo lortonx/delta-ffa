@@ -1,11 +1,9 @@
 // @ts-check
-const Router = require("../sockets/Router");
-const ServerHandle = require("../ServerHandle");
-const World = require("./World");
-const Cell = require("../cells/Cell");
-const PlayerCell = require("../cells/PlayerCell");
-const Connection = require("../sockets/Connection");
-
+import Cell from "../cells/Cell"
+import PlayerCell from "../cells/PlayerCell"
+import ServerHandle from "../ServerHandle"
+import Connection from "../sockets/Connection"
+import World from "./World"
 /**
  * Всё что связано с единичным игроком
  */
@@ -48,6 +46,7 @@ class Player {
 
         /** @type {PlayerState} */
         this.state = -1;
+        this.life = 0;
         this.hasWorld = false;
         /** @type {World} */
         this.world = null;
@@ -177,4 +176,4 @@ class Player {
     }
 }
 
-module.exports = Player;
+export default Player;

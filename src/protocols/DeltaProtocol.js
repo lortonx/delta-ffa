@@ -1,7 +1,9 @@
 // @ts-check
-const Protocol = require("./Protocol");
-const Reader = require("../primitives/Reader");
-const Writer = require("../primitives/Writer");
+
+import Reader from "../primitives/Reader";
+import Writer from "../primitives/Writer";
+import Protocol from "./Protocol";
+
 class DeltaProtocol extends Protocol {
     /**
      * @param {Connection} connection
@@ -290,7 +292,7 @@ class DeltaProtocol extends Protocol {
     }
 }
 
-module.exports = DeltaProtocol;
+export default DeltaProtocol;
 
 /**
  * @type {{ [protocol: number]: (writer: Writer, data: LeaderboardDataType["pie"][], protocol: number) => void }}
@@ -420,7 +422,7 @@ function writeZTString(writer, value, protocol) {
     writer[protocol < 6 ? "writeZTStringUCS2" : "writeZTStringUTF8"](value);
 }
 
-const Cell = require("../cells/Cell");
-const Player = require("../worlds/Player");
-const PlayerCell = require("../cells/PlayerCell");
-const Connection = require("../sockets/Connection");
+import Cell from "../cells/Cell";
+import PlayerCell from "../cells/PlayerCell";
+import Connection from "../sockets/Connection";
+import Player from "../worlds/Player";

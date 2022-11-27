@@ -1,13 +1,15 @@
+
+
 // @ts-check
 class Router {
     /**
-     * @param {Listener} listener
+     * @param {import('./Listener').default} listener
      */
     constructor(listener) {
         this.listener = listener;
         this.disconnected = false;
         this.disconnectionTick = NaN;
-        /** @type {World} default player */
+        /** @type {import('../worlds/World').default} default player */
         this.world = null
         this.hasWorld = false
 
@@ -194,10 +196,9 @@ class Router {
     }
 }
 
-module.exports = Router;
+export default Router;
 
-const Listener = require("./Listener");
-const Player = require("../worlds/Player");
-const PlayerCell = require("../cells/PlayerCell");const Cell = require("../cells/Cell");
-const World = require("../worlds/World");
+import Cell from "../cells/Cell";
+import PlayerCell from "../cells/PlayerCell";
+import Player from "../worlds/Player";
 

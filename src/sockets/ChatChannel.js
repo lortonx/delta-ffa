@@ -1,3 +1,5 @@
+
+
 // @ts-check
 const serverSource = {
     name: "Server",
@@ -76,10 +78,8 @@ class ChatChannel {
     }
 }
 
-module.exports = ChatChannel;
+export default ChatChannel;
 
-const Listener = require("./Listener");
-const Connection = require("./Connection");const Router = require("./Router");
-const ServerHandle = require("../ServerHandle");
-const World = require("../worlds/World");
-
+import World from "../worlds/World";
+import Connection from "./Connection";
+import Listener from "./Listener";

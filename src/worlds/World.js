@@ -1,18 +1,24 @@
+
+import EjectedCell from "../cells/EjectedCell"
+import Fuckercell from "../cells/Fuckercell"
+import Mothercell from "../cells/Mothercell"
+import Pellet from "../cells/Pellet"
+import Virus from "../cells/Virus"
+
+import { fullyIntersects } from "../primitives/Misc"
+import QuadTree from "../primitives/QuadTree"
+import ServerHandle from "../ServerHandle"
+import ChatChannel from "../sockets/ChatChannel"
+import Connection from "../sockets/Connection"
+import Player from "./Player"
+
+import Cell from "../cells/Cell"
+import PlayerCell from "../cells/PlayerCell"
+import Bot from "../bots/Bot"
+import Minion from "../bots/Minion"
+import PlayerBot from "../bots/PlayerBot"
+
 // @ts-check
-const QuadTree = require("../primitives/QuadTree");
-
-const Minion = require("../bots/Minion");
-const PlayerBot = require("../bots/PlayerBot");
-
-const Pellet = require("../cells/Pellet");
-const EjectedCell = require("../cells/EjectedCell");
-const PlayerCell = require("../cells/PlayerCell");
-const Mothercell = require("../cells/Mothercell");
-const Fuckercell = require("../cells/Fuckercell");
-const Virus = require("../cells/Virus");
-const ChatChannel = require("../sockets/ChatChannel");
-
-const { fullyIntersects } = require("../primitives/Misc");
 /**
  * @param {any[]} arr 
  * @param {number} i 
@@ -36,7 +42,7 @@ class World {
     constructor(handle, id) {
         this.handle = handle;
         this.id = id;
-
+        this.hadPlayers = false // only for LMS
         this.frozen = false;
 
         this._nextCellId = 1;
@@ -84,6 +90,8 @@ class World {
             loadTime: NaN,
             uptime: NaN
         };
+        /** @type {{[team: number]: Player[]}} */
+        this.teams = {}
 
         this.setBorder({ x: this.settings.worldMapX, y: this.settings.worldMapY, w: this.settings.worldMapW, h: this.settings.worldMapH });
     }
@@ -845,11 +853,7 @@ class World {
     }
 }
 
-module.exports = World;
+export default World;
 
-const Cell = require("../cells/Cell");
-const Player = require("./Player");
-const ServerHandle = require("../ServerHandle");const Router = require("../sockets/Router");
-const Connection = require("../sockets/Connection");
-const Bot = require("../bots/Bot");
+import Router from "../sockets/Router"
 

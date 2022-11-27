@@ -1,4 +1,5 @@
 // @ts-check
+debugger
 const {WT} = require('./WT.js');
 const wrtc = require('wrtc');
 const SimplePeer = require('simple-peer')
@@ -244,7 +245,7 @@ class PEER extends Eventify{
 }
 
 
-module.exports = {Peer: PEER}
+export default {Peer: PEER}
 
 
 

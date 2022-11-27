@@ -1,8 +1,10 @@
 // @ts-check
-const Router = require("./Router");
-const Reader = require("../primitives/Reader");
-const { filterIPAddress } = require("../primitives/Misc");
-const uWS = require('uWebSockets.js') 
+import {default as uWS} from 'uWebSockets.js'
+
+
+import { filterIPAddress } from '../primitives/Misc'
+import Reader from '../primitives/Reader'
+import Router from './Router';
 
 /**
  * Конект вебсокет
@@ -200,12 +202,12 @@ class Connection extends Router {
     }
 }
 
-module.exports = Connection;
+export default Connection;
 
 
-const Listener = require("./Listener");
-const Minion = require("../bots/Minion");
-const Protocol = require("../protocols/Protocol");
-const PlayerCell = require("../cells/PlayerCell");
-const ConnectionData = require("./ConnectionData");
+import Listener from './Listener';
+import Minion from '../bots/Minion';
+import Protocol from '../protocols/Protocol';
+import PlayerCell from '../cells/PlayerCell';
+import ConnectionData from './ConnectionData';
 

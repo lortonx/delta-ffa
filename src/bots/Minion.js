@@ -1,5 +1,7 @@
+
+
 // @ts-check
-const Bot = require("./Bot");
+import Bot from "./Bot";
 
 class Minion extends Bot {
     /**
@@ -49,7 +51,6 @@ class Minion extends Bot {
     }
 }
 
-module.exports = Minion;
+export default Minion;
 
-const Connection = require("../sockets/Connection");const Router = require("../sockets/Router");
-
+import Connection from "../sockets/Connection";

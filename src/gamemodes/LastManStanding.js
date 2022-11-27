@@ -1,7 +1,10 @@
+import Player from "../worlds/Player";
+
+
 // @ts-check
-const FFA = require("./FFA");
 
 class LastManStanding extends FFA {
+    // @ts-ignore
     static get name() { return "Last Man Standing"; }
     static get type() { return 0; }
 
@@ -29,15 +32,16 @@ class LastManStanding extends FFA {
     /**
      * @param {Player} player
      * @param {string} name
+     * @param {string} skin
      */
-    onPlayerSpawnRequest(player, name) {
+    onPlayerSpawnRequest(player, name, skin) {
         if (player.connection.isExternal && player.life++ > 0)
             return void this.handle.listener.globalChat.directMessage(null, player.connection, "You cannot spawn anymore.");
-        super.onPlayerSpawnRequest(player, name);
+        super.onPlayerSpawnRequest(player, name, skin);
     }
 }
 
-module.exports = LastManStanding;
+export default LastManStanding;
 
-const World = require("../worlds/World");
-const Player = require("../worlds/Player");
+import World from "../worlds/World";
+import FFA from "./FFA";

@@ -56,5 +56,5 @@ class ConnectionData{
 	}
 }
 
-module.exports = ConnectionData
-const uWS = require('uWebSockets.js') 
+export default ConnectionData
+import * as uWS from 'uWebSockets.js'

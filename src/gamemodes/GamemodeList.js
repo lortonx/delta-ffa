@@ -1,3 +1,4 @@
+
 // @ts-check
 class GamemodeList {
     /**
@@ -31,7 +32,7 @@ class GamemodeList {
     }
 }
 
-module.exports = GamemodeList;
+export default GamemodeList;
 
-const Gamemode = require("./Gamemode");
-const ServerHandle = require("../ServerHandle");
+import ServerHandle from "../ServerHandle";
+import Gamemode from "./Gamemode";

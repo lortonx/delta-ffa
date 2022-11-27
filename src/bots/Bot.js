@@ -1,12 +1,13 @@
 // @ts-check
-const Router = require("../sockets/Router");
+
+import Router from "../sockets/Router";
 
 /**
  * @abstract
 */
 class Bot extends Router {
     /**
-     * @param {World} world
+     * @param {import('../worlds/World').default} world
      */
     constructor(world) {
         super(world.handle.listener);
@@ -25,6 +26,6 @@ class Bot extends Router {
     }
 }
 
-module.exports = Bot;
+export default Bot;
 
-const World = require("../worlds/World");
+// import World from "../worlds/World";

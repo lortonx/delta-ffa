@@ -1,6 +1,7 @@
 // @ts-check
-const Gamemode = require("./Gamemode");
-const Misc = require("../primitives/Misc");
+import Gamemode from "./Gamemode";
+import * as Misc from "../primitives/Misc"
+
 
 /**
  * @param {Player} player
@@ -25,6 +26,7 @@ class FFA extends Gamemode {
     }
 
     static get type() { return 0; }
+    // @ts-ignore
     static get name() { return "FFA"; }
 
     /**
@@ -100,9 +102,9 @@ class FFA extends Gamemode {
     }
 }
 
-module.exports = FFA;
+export default FFA;
  
-const ServerHandle = require("../ServerHandle");
-const World = require("../worlds/World");
-const Connection = require("../sockets/Connection");
-const Player = require("../worlds/Player");
+import Player from "../worlds/Player";
+import Connection from "../sockets/Connection";
+import World from "../worlds/World";
+import ServerHandle from "../ServerHandle";

@@ -1,4 +1,7 @@
 // @ts-check
+
+
+
 /**
  * @template T
  */
@@ -54,18 +57,18 @@ class CommandList {
         return true;
     }
 }
-
-module.exports = {
+/**
+ * @template T
+ * @param {{ args: string, desc: string, name: string, exec: (handle: ServerHandle, context: T, args: string[]) => void }} info
+ * @returns {Command}
+ */
+function genCommand(info) {
+    return new Command(info.name, info.desc, info.args, info.exec);
+}
+export {
     Command,
     CommandList,
-    /**
-     * @template T
-     * @param {{ args: string, desc: string, name: string, exec: (handle: ServerHandle, context: T, args: string[]) => void }} info
-     * @returns {Command}
-     */
-    genCommand(info) {
-        return new Command(info.name, info.desc, info.args, info.exec);
-    }
+    genCommand
 };
 
-const ServerHandle = require("../ServerHandle");
+import ServerHandle from "../ServerHandle";

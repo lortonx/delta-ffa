@@ -1,6 +1,6 @@
 // @ts-check
-const Misc = require("../primitives/Misc");
-const Cell = require("./Cell");
+import * as Misc from "../primitives/Misc"
+import Cell from "./Cell";
 
 class Pellet extends Cell {
     /**
@@ -43,6 +43,6 @@ class Pellet extends Cell {
     }
 }
 
-module.exports = Pellet;
+export default Pellet;
 
-const World = require("../worlds/World");
+import World from "../worlds/World";

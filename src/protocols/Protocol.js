@@ -1,4 +1,7 @@
 // @ts-check
+
+
+
 /**
  * @abstract
  */
@@ -100,10 +103,9 @@ class Protocol {
     }
 }
 
-module.exports = Protocol;
+export default Protocol;
 
-const Reader = require("../primitives/Reader");
-const Cell = require("../cells/Cell");
-const PlayerCell = require("../cells/PlayerCell");
-const Connection = require("../sockets/Connection");const World = require("../worlds/World");
-
+import Cell from "../cells/Cell";
+import PlayerCell from "../cells/PlayerCell";
+import Reader from "../primitives/Reader";
+import Connection from "../sockets/Connection";

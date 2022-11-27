@@ -1,19 +1,26 @@
-const fs = require("fs");
-const DefaultSettings = require("../src/Settings");
-const ServerHandle = require("../src/ServerHandle");
-const { genCommand } = require("../src/commands/CommandList");
-const readline = require("readline");
+import * as fs from "fs";
+import DefaultSettings from "../src/Settings";
+import ServerHandle from "../src/ServerHandle";
+import {genCommand} from "../src/commands/CommandList";
+import * as readline from 'readline';
 
-const DefaultCommands = require("../src/commands/DefaultCommands");
+import DefaultCommands from "../src/commands/DefaultCommands";
+
+import LegacyProtocol from "../src/protocols/LegacyProtocol";
+import ModernProtocol from "../src/protocols/ModernProtocol";
+import DeltaProtocol from "../src/protocols/DeltaProtocol";
 const DefaultProtocols = [
-    require("../src/protocols/LegacyProtocol"),
-    require("../src/protocols/ModernProtocol"),
-    require("../src/protocols/DeltaProtocol"),
+    LegacyProtocol,
+    ModernProtocol,
+    DeltaProtocol,
 ];
+import FFA from "../src/gamemodes/FFA";
+import Teams from "../src/gamemodes/Teams";
+import LastManStanding from "../src/gamemodes/LastManStanding";
 const DefaultGamemodes = [
-    require("../src/gamemodes/FFA"),
-    require("../src/gamemodes/Teams"),
-    require("../src/gamemodes/LastManStanding")
+    FFA,
+    Teams,
+    LastManStanding
 ];
 
 /** @returns {DefaultSettings} */
@@ -35,7 +42,10 @@ let settings = readSettings();
 
 const currentHandle = new ServerHandle(settings);
 overwriteSettings(currentHandle.settings);
-require("./log-handler")(currentHandle);
+
+import logHandler from "./log-handler"
+logHandler(currentHandle)
+
 const logger = currentHandle.logger;
 
 let commandStreamClosing = false;

@@ -1,22 +1,15 @@
 // @ts-check
 'use strict';
-// const uWS = require('./uWebSockets.js-18.14.0/uws.js')
-//const WebSocket = require("ws"); 
-//const WebSocketServer = WebSocket.Server;
 
-const uWS = require('uWebSockets.js') 
-const net = require('net');
-const {WT} = require('./WT.js');
-// const wrtc = require('wrtc')
-const {Peer} = require('./microPeer.js')
-// console.log(wrtc)
-
-const Connection = require("./Connection");
-const ChatChannel = require("./ChatChannel");
-const { filterIPAddress } = require("../primitives/Misc");
-const ConnectionData = require('./ConnectionData.js');
-
-
+import {default as uWS} from 'uWebSockets.js'
+import * as net from 'net'
+import { filterIPAddress } from '../primitives/Misc';
+import ChatChannel from './ChatChannel';
+import Connection from './Connection';
+// import { Peer } from './microPeer';
+// import { WT } from './WT';
+import ServerHandle from '../ServerHandle';
+import ConnectionData from './ConnectionData';
 class Listener {
     /**
      * @param {ServerHandle} handle
@@ -73,7 +66,7 @@ class Listener {
             message: (ws, message, isBinary) => {
                 ws.connection.onSocketMessage(message, isBinary)
             },
-            /** @param {uWS.WebSocket & {connection:import('./Connection')}} ws */ // @ts-ignore
+            /** @param {uWS.WebSocket & {connection:import('./Connection').default}} ws */ // @ts-ignore
             close: (ws, code, message) => {
                 console.log(code, message, this.connectionsByIP)
                 const decoder = new TextDecoder("utf-8");
@@ -404,8 +397,6 @@ class Listener {
     }
 }
 
-module.exports = Listener;
-
-const Router = require("./Router");
-const ServerHandle = require("../ServerHandle");
+export default Listener;
+import Router from './Router';
 

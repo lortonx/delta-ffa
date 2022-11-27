@@ -1,3 +1,7 @@
+import ServerHandle from "../ServerHandle";
+import Connection from "../sockets/Connection";
+import World from "./World";
+
 // @ts-check
 class Matchmaker {
     /**
@@ -82,8 +86,4 @@ class Matchmaker {
     }
 }
 
-module.exports = Matchmaker;
-
-const ServerHandle = require("../ServerHandle");
-const Connection = require("../sockets/Connection");
-const World = require("../worlds/World");
+export default Matchmaker;

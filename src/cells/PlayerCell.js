@@ -1,5 +1,5 @@
 // @ts-check
-const Cell = require("./Cell");
+import Cell from "./Cell";
 
 class PlayerCell extends Cell {
     /**
@@ -92,6 +92,6 @@ class PlayerCell extends Cell {
     }
 }
 
-module.exports = PlayerCell;
+export default PlayerCell;
 
-const Player = require("../worlds/Player");
+import Player from "../worlds/Player";

@@ -1,4 +1,5 @@
 // @ts-check
+debugger
 const {Eventify,debounce} = require('../libs/eventify')
 const WebSocket = require('ws')
 

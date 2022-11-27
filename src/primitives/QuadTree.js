@@ -1,5 +1,5 @@
 // @ts-check
-const { intersects, fullyIntersects, getQuadIntersect, getQuadFullIntersect } = require("../primitives/Misc");
+import { intersects, fullyIntersects, getQuadIntersect, getQuadFullIntersect } from "../primitives/Misc";
 
 /**
  * @template T
@@ -221,4 +221,4 @@ class QuadTree {
     }
 }
 
-module.exports = QuadTree;
+export default QuadTree;

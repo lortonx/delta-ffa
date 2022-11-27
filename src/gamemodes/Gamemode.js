@@ -1,4 +1,7 @@
 // @ts-check
+
+
+
 /** @abstract */
 class Gamemode {
     /** @param {ServerHandle} handle */
@@ -77,11 +80,11 @@ class Gamemode {
     onCellRemove(cell) { }
 }
 
-module.exports = Gamemode;
+export default Gamemode;
 
-const ServerHandle = require("../ServerHandle");
-const World = require("../worlds/World");
-const Connection = require("../sockets/Connection");
-const Player = require("../worlds/Player");
-const Cell = require("../cells/Cell");
-const PlayerCell = require("../cells/PlayerCell");
+import Cell from "../cells/Cell";
+import PlayerCell from "../cells/PlayerCell";
+import ServerHandle from "../ServerHandle";
+import Connection from "../sockets/Connection";
+import Player from "../worlds/Player";
+import World from "../worlds/World";

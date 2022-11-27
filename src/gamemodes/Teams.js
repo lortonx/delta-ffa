@@ -1,6 +1,6 @@
 // @ts-check
-const Gamemode = require("./Gamemode");
-const Misc = require("../primitives/Misc");
+import Gamemode from "./Gamemode";
+import * as Misc from "../primitives/Misc"
 
 const highlightBase = 231,
        lowlightBase = 23,
@@ -36,7 +36,7 @@ class Teams extends Gamemode {
     constructor(handle) {
         super(handle);
     }
-
+    // @ts-ignore
     static get name() { return "Teams"; }
     static get type() { return 2; }
 
@@ -117,9 +117,9 @@ class Teams extends Gamemode {
     }
 }
 
-module.exports = Teams;
+export default Teams;
 
-const ServerHandle = require("../ServerHandle");
-const World = require("../worlds/World");
-const Connection = require("../sockets/Connection");
-const Player = require("../worlds/Player");
+import ServerHandle from "../ServerHandle";
+import World from "../worlds/World";
+import Connection from "../sockets/Connection";
+import Player from "../worlds/Player";

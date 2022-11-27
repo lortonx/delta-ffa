@@ -1,5 +1,9 @@
 // @ts-check
 
+import Reader from "../primitives/Reader";
+import Connection from "../sockets/Connection";
+import Protocol from "./Protocol";
+
 class ProtocolStore {
     constructor() {
         /** @type {typeof Protocol[]} */
@@ -30,8 +34,4 @@ class ProtocolStore {
     }
 }
 
-module.exports = ProtocolStore;
-
-const Protocol = require("./Protocol");
-const Connection = require("../sockets/Connection");
-const Reader = require("../primitives/Reader");
+export default ProtocolStore;

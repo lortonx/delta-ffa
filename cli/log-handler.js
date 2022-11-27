@@ -23,8 +23,8 @@ let settings = {
     fileLogSaveOld: true
 };
 
-const { EOL } = require("os");
-const fs = require("fs");
+import { EOL } from "os";
+import * as fs from "fs"
 
 if (fs.existsSync("./log-settings.json"))
     settings = Object.assign(settings, JSON.parse(fs.readFileSync("./log-settings.json", "utf-8")));
@@ -150,6 +150,6 @@ process.once("exit", function(code) {
 /**
  * @param {ServerHandle} handle
  */
-module.exports = (handle) => handle.logger.onlog = write;
+export default (handle) => handle.logger.onlog = write;
 
-const ServerHandle = require("../src/ServerHandle");
+import ServerHandle from "../src/ServerHandle";

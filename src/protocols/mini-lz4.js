@@ -343,4 +343,4 @@ var MiniLZ4 = (function() {
     return exports;
     
     })();
-module.exports = MiniLZ4
+export default MiniLZ4

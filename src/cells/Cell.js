@@ -1,5 +1,5 @@
 // @ts-check
-const { throwIfBadNumber, throwIfBadOrNegativeNumber } = require("../primitives/Misc");
+import { throwIfBadNumber, throwIfBadOrNegativeNumber } from "../primitives/Misc";
 
 const BITS = {
     posChanged: 0x0001,
@@ -33,7 +33,7 @@ class Cell {
         mothercell: 4,
     }
     /**
-     * @param {World} world
+     * @param {import('../worlds/World').default} world
      * @param {number} x
      * @param {number} y
      * @param {number} size
@@ -41,7 +41,7 @@ class Cell {
      */
     constructor(world, x, y, size, color) {
         this.world = world;
-        /**@type {QuadTree<import("../primitives/QuadTree").QuadItem<Cell>>} */
+        /**@type {import("../primitives/QuadTree").default<import("../primitives/QuadTree").QuadItem<Cell>>} */
         this.__root = null
 
         this.id = world.nextCellId;
@@ -60,7 +60,7 @@ class Cell {
             d: 0
         };
 
-        /** @type {Player} */
+        /** @type {import('../worlds/Player').default} */
         this.owner = null;
         /** @type {Cell} */
         this.cellEjector = null;
@@ -214,9 +214,9 @@ class Cell {
     onRemoved() { }
 }
 
-module.exports = Cell;
+export default Cell;
 
-const World = require("../worlds/World");
-const Player = require("../worlds/Player");
-const QuadTree = require("../primitives/QuadTree");
 
+import QuadTree from "../primitives/QuadTree";
+// import Player from "../worlds/Player";
+// import World from "../worlds/World";

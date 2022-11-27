@@ -22,4 +22,4 @@ class Stopwatch {
     }
 }
 
-module.exports = Stopwatch;
+export default Stopwatch;

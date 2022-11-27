@@ -1,7 +1,7 @@
 // @ts-check
-const Protocol = require("./Protocol");
-const Reader = require("../primitives/Reader");
-const Writer = require("../primitives/Writer");
+import Reader from "../primitives/Reader";
+import Writer from "../primitives/Writer";
+import Protocol from "./Protocol";
 
 const PingReturn = Buffer.from(new Uint8Array([2]));
 
@@ -328,8 +328,8 @@ class ModernProtocol extends Protocol {
     }
 }
 
-module.exports = ModernProtocol;
+export default ModernProtocol;
 
-const Cell = require("../cells/Cell");
-const PlayerCell = require("../cells/PlayerCell");
-const Connection = require("../sockets/Connection");
+import Cell from "../cells/Cell";
+import PlayerCell from "../cells/PlayerCell";
+import Connection from "../sockets/Connection";

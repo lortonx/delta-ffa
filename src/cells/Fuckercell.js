@@ -1,7 +1,8 @@
 // @ts-check
-const Cell = require("./Cell");
-const Pellet = require("./Pellet");
-const Virus = require("./Virus");
+
+import Cell from "./Cell";
+import Virus from "./Virus";
+
 /**
  * @implements {Spawner}
  */
@@ -98,7 +99,8 @@ class Fuckercell extends Cell {
     }
 }
 
-module.exports = Fuckercell;
+export default Fuckercell;
 
-const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+import World from "../worlds/World";
+import PlayerCell from "./PlayerCell";
 

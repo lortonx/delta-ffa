@@ -1,5 +1,5 @@
 // @ts-check
-const util = require("util");
+import * as util from 'util'
 
 class Logger {
     constructor() {
@@ -78,4 +78,4 @@ class Logger {
     }
 }
 
-module.exports = Logger;
+export default Logger;

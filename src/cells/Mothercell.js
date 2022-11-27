@@ -1,6 +1,6 @@
 // @ts-check
-const Cell = require("./Cell");
-const Pellet = require("./Pellet");
+import Cell from "./Cell";
+import Pellet from "./Pellet";
 
 /**
  * @implements {Spawner}
@@ -83,7 +83,8 @@ class Mothercell extends Cell {
     }
 }
 
-module.exports = Mothercell;
+export default Mothercell;
 
-const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+import World from "../worlds/World";
+import PlayerCell from "./PlayerCell";
 

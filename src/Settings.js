@@ -111,4 +111,4 @@ const value = /*Object.seal(*/{
     playerDecayMult: 0.002014 //множитель худения. эталон 0.002014, для ffa внезапно 17-19
 }/*);*/
 
-module.exports = value;
+export default value

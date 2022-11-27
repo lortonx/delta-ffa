@@ -1,5 +1,5 @@
 // @ts-check
-const Cell = require("./Cell");
+import Cell from "./Cell";
 
 class Virus extends Cell {
     /**
@@ -75,7 +75,8 @@ class Virus extends Cell {
     }
 }
 
-module.exports = Virus;
+export default Virus;
 
-const World = require("../worlds/World");const PlayerCell = require("./PlayerCell");
+import World from "../worlds/World";
+import PlayerCell from "./PlayerCell";
 

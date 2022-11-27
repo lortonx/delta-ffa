@@ -80,4 +80,4 @@ class Reader {
     }
 }
 
-module.exports = Reader;
+export default Reader;

@@ -1,15 +1,15 @@
 // @ts-check
-const Bot = require("./Bot");
+import Bot from "./Bot";
 
 class PlayerBot extends Bot {
     /**
-     * @param {World} world
+     * @param {import('../worlds/World').default} world
      */
     constructor(world) {
         super(world);
 
         this.splitCooldownTicks = 0;
-        /** @type {Cell} */
+        /** @type {import("../cells/Cell").default} */
         this.target = null;
     }
 
@@ -38,7 +38,7 @@ class PlayerBot extends Bot {
             this.player.spawningName = null;
         }
 
-        /** @type {PlayerCell} */
+        /** @type {import("../cells/PlayerCell").default} */
         let cell = null;
         for (let i = 0, l = player.ownedCells.length; i < l; i++)
             if (cell === null || player.ownedCells[i].size > cell.size)
@@ -150,8 +150,8 @@ class PlayerBot extends Bot {
     }
 }
 
-module.exports = PlayerBot;
+export default PlayerBot;
 
-const World = require("../worlds/World");
-const Cell = require("../cells/Cell");
-const PlayerCell = require("../cells/PlayerCell");
+// import World from "../worlds/World";
+// import Cell from "../cells/Cell";
+// import PlayerCell from "../cells/PlayerCell";
