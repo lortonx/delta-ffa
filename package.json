@@ -1,37 +1,49 @@
 {
-    "name": "ogarii",
-    "version": "1.3.6",
-    "description": "FOSS implementation of a private Agar.io gameserver",
-    "license": "Apache-2.0",
-    "scripts": {
-        "start": "node cli/index.js",
-        "start2": "nodemon --inspect cli/index.js --ignore 'logs/*' --ignore settings.json --ignore log-settings.json"
-    },
-    "author": {
-        "name": "Luka Djokovic",
-        "url": "https://github.com/Luka967",
-        "email": "luka.djokovic2@gmail.com"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Luka967/OgarII.git"
-    },
-    "bugs": {
-        "email": "anusualmail123@gmail.com",
-        "url": "https://github.com/Luka967/OgarII/issues"
-    },
-    "dependencies": {
-        "@mapbox/node-pre-gyp": "^1.0.8",
-        "simple-peer": "^9.11.0",
-        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.3.0",
-        "wrtc": "^0.4.7",
-        "ws": "^8.4.2"
-    },
-    "engines": {
-        "node": "16.x",
-        "desc": "this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
-    },
-    "devDependencies": {
-        "assemblyscript": "^0.24.1"
-    }
+	"name": "ogarii",
+	"version": "1.3.6",
+	"description": "FOSS implementation of a private Agar.io gameserver",
+	"license": "Apache-2.0",
+	"scripts": {
+		"start": "node cli/index.js",
+		"start2": "nodemon --inspect cli/index.js --ignore 'logs/*' --ignore settings.json --ignore log-settings.json --ignore 'assembly/*'",
+		"asbuild:debug": "asc assembly/index.ts --target debug",
+		"asbuild:dev": "nodemon -e ts -w ./assembly --exec \"npm run asbuild:debug\"",
+		"asbuild:release": "asc assembly/index.ts --target release",
+		"asbuild": "npm run asbuild:debug && npm run asbuild:release",
+		"test": "node tests"
+	},
+	"author": {
+		"name": "Luka Djokovic",
+		"url": "https://github.com/Luka967",
+		"email": "luka.djokovic2@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Luka967/OgarII.git"
+	},
+	"bugs": {
+		"email": "anusualmail123@gmail.com",
+		"url": "https://github.com/Luka967/OgarII/issues"
+	},
+	"dependencies": {
+		"@mapbox/node-pre-gyp": "^1.0.8",
+		"simple-peer": "^9.11.0",
+		"uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.3.0",
+		"wrtc": "^0.4.7",
+		"ws": "^8.4.2"
+	},
+	"engines": {
+		"node": "16.x",
+		"desc": "this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
+	},
+	"devDependencies": {
+		"assemblyscript": "^0.24.1"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+		"import": "./build/release.js",
+		"types": "./build/release.d.ts"
+		}
+	}
 }

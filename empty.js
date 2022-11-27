@@ -1,2 +1,1 @@
-const uWS = require('uWebSockets.js') 
-uWS
+import * as uWS from 'uWebSockets.js'
