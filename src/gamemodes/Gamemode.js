@@ -8,9 +8,9 @@ class Gamemode {
 
     /** @returns {number} @abstract */
     static get type() { throw new Error("Must be overriden"); }
-    /** @returns {number} */
+    /** @returns {number} */ // @ts-ignore
     get type() { return this.constructor.type; }
-    /** @returns {string} @abstract */
+    /** @returns {string} @abstract */ // @ts-ignore
     static get name() { throw new Error("Must be overriden"); }
     /** @returns {string} */
     get name() { return this.constructor.name; }

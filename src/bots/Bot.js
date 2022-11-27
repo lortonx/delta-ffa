@@ -11,6 +11,7 @@ class Bot extends Router {
     constructor(world) {
         super(world.handle.listener);
         this.createPlayer();
+        world.addRouter(this)
         world.addPlayer(this.player);
     }
 

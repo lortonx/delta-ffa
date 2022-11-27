@@ -29,7 +29,7 @@ class Pellet extends Cell {
 
     onTick() {
         super.onTick();
-        if (this.size >= this.world.settings.pelletMaxSize) return;
+        if (this._size >= this.world.settings.pelletMaxSize) return;
         if (this.world.handle.tick - this.lastGrowTick > this.world.settings.pelletGrowTicks / this.world.handle.stepMult) {
             this.lastGrowTick = this.world.handle.tick;
             this.mass++;

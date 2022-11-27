@@ -34,15 +34,16 @@ class FFA extends Gamemode {
      */
     onPlayerSpawnRequest(player, name, skin) {
         if (player.state === 0 || !player.hasWorld) return;
-        const size = player.router.type === "minion" ?
+        const size = player.connection.type === "minion" ?
              this.handle.settings.minionSpawnSize :
              this.handle.settings.playerSpawnSize;
-        const spawnInfo = player.world.getPlayerSpawn(size);
+        // const spawnInfo = player.world.getPlayerSpawn(size);
+        const spawnInfo = player.world.getPlayerSpawn(size, player.connection.anyPlay? {x: player.connection.mouseX, y: player.connection.mouseY}: null);
         const color = spawnInfo.color || Misc.randomColor();
         player.cellName = player.chatName = player.leaderboardName = name;
         player.cellSkin = skin;
         player.chatColor = player.cellColor = color;
-        player.world.spawnPlayer(player, spawnInfo.pos, size, name, null);
+        player.world.spawnPlayer(player, spawnInfo.pos, size);
     }
 
     /**

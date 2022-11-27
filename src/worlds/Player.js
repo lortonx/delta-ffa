@@ -18,8 +18,14 @@ class Player {
     constructor(handle, id, router) {
         this.handle = handle;
         this.id = id;
-        this.router = router;
+        this.connection = router;
         this.exists = true;
+        this.ejectAttempts = 0
+        this.splitAttempts = 0
+        this.ejectMacroPressed = false
+        this.ejectMacroProcessed = false
+        this.spawnRequested = false
+        this.ejectTick = this.handle.tick;
         
         this.mouseX = 0
         this.mouseY = 0
@@ -28,6 +34,8 @@ class Player {
         this.extraDecayMult = 0
         /** @type {string} */
         this.leaderboardName = null;
+        /** @type {string} */
+        this.spawningName = null;
         /** @type {string} */
         this.cellName = null;
         this.chatName = "Spectator";
@@ -49,10 +57,10 @@ class Player {
 
         /** @type {PlayerCell[]} */
         this.ownedCells = [];
-        /** @type {{[cellId: string]: Cell}} */
-        this.visibleCells = { };
-        /** @type {{[cellId: string]: Cell}} */
-        this.lastVisibleCells = { };
+        // /** @type {{[cellId: string]: Cell}} */
+        // this.visibleCells = { };
+        // /** @type {{[cellId: string]: Cell}} */
+        // this.lastVisibleCells = { };
         /** @type {ViewArea} */
         this.viewArea = {
             x: 0,
@@ -74,12 +82,12 @@ class Player {
      * @param {PlayerState} targetState
      */
     updateState(targetState) {
-        if (this.world === null)                            this.state = -1;
-        else if (this.ownedCells.length > 0)                this.state = 0;
-        else if (targetState === -1)                        this.state = -1;
-        else if (this.world.largestPlayer === null)         this.state = 2;
-        else if (this.state === 1 && targetState === 2)     this.state = 2;
-        else                                                this.state = 1;
+        if (this.world === null)                            this.state = -1; // idle
+        else if (this.ownedCells.length > 0)                this.state = 0;  // playing
+        else if (targetState === -1)                        this.state = -1; // idle
+        else if (this.world.largestPlayer === null)         this.state = 2;  // roaming
+        else if (this.state === 1 && targetState === 2)     this.state = 2;  // roaming
+        else                                                this.state = 1;  // spectating
     }
 
     updateViewArea() {
@@ -115,8 +123,8 @@ class Player {
                 break;
             case 2: // roaming
                 this.score = NaN;
-                let dx = this.router.mouseX - this.viewArea.x;
-                let dy = this.router.mouseY - this.viewArea.y;
+                let dx = this.connection.mouseX - this.viewArea.x;
+                let dy = this.connection.mouseY - this.viewArea.y;
                 const d = Math.sqrt(dx * dx + dy * dy);
                 const D = Math.min(d, this.settings.playerRoamSpeed);
                 if (D < 1) break; dx /= d; dy /= d;
@@ -146,11 +154,26 @@ class Player {
     }
 
     checkExistence() {
-        if (!this.router.disconnected) return;
+        if (!this.connection.disconnected) return;
         if (this.state !== 0) return void this.handle.removePlayer(this.id);
         const disposeDelay = this.settings.worldPlayerDisposeDelay;
-        if (disposeDelay > 0 && this.handle.tick - this.router.disconnectionTick >= disposeDelay)
+        if (disposeDelay > 0 && this.handle.tick - this.connection.disconnectionTick >= disposeDelay)
             this.handle.removePlayer(this.id);
+    }
+
+    /** @virtual */
+    onSpawnRequest() {
+        let name = this.spawningName.slice(0, this.settings.playerMaxNameLength);
+        /** @type {string} */
+        let skin;
+        if (this.settings.playerAllowSkinInName) {
+            const regex = /\<(.*)\>(.*)/.exec(name);
+            if (regex !== null) {
+                name = regex[2];
+                skin = regex[1];
+            }
+        }
+        if(this.state != 0) this.handle.gamemode.onPlayerSpawnRequest(this, name, skin);
     }
 }
 

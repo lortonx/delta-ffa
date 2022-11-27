@@ -80,7 +80,7 @@ class PlayerCell extends Cell {
 
     onSpawned() {
         this.SPIKED = this.name===' '?true:false
-        this.owner.router.onNewOwnedCell(this);
+        this.owner.connection.onNewOwnedCell(this);
         this.owner.ownedCells.push(this);
         this.world.playerCells.unshift(this);
     }

@@ -53,7 +53,7 @@ class Teams extends Gamemode {
      * @param {World} world
      */
     onPlayerJoinWorld(player, world) {
-        if (!player.router.separateInTeams) return;
+        if (!player.connection.separateInTeams) return;
         let team = 0;
         for (let i = 0; i < teamCount; i++)
             team = world.teams[i].length < world.teams[team].length ? i : team;
@@ -66,7 +66,7 @@ class Teams extends Gamemode {
      * @param {World} world
      */
     onPlayerLeaveWorld(player, world) {
-        if (!player.router.separateInTeams) return;
+        if (!player.connection.separateInTeams) return;
         world.teams[player.team].splice(world.teams[player.team].indexOf(player), 1);
         player.team = null;
     }
@@ -78,11 +78,11 @@ class Teams extends Gamemode {
      */
     onPlayerSpawnRequest(player, name, skin) {
         if (player.state === 0 || !player.hasWorld) return;
-        const size = player.router.type === "minion" ?
+        const size = player.connection.type === "minion" ?
             this.handle.settings.minionSpawnSize :
             this.handle.settings.playerSpawnSize;
         const pos = player.world.getSafeSpawnPos(size);
-        const color = player.router.separateInTeams ? getTeamColor(player.team) : Misc.randomColor();
+        const color = player.connection.separateInTeams ? getTeamColor(player.team) : Misc.randomColor();
         player.cellName = player.chatName = player.leaderboardName = name;
         player.cellSkin = null;
         player.chatColor = player.cellColor = color;

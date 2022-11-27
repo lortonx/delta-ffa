@@ -7,28 +7,38 @@ class Router {
         this.listener = listener;
         this.disconnected = false;
         this.disconnectionTick = NaN;
+        /** @type {World} default player */
+        this.world = null
+        this.hasWorld = false
 
         this.mouseX = 0;
         this.mouseY = 0;
 
-        /** @type {string=} */
-        this.spawningName = null;
+        // /** @type {string=} */
+        // this.spawningName = null;
         this.requestingSpectate = false;
         this.isPressingQ = false;
         this.hasProcessedQ = false;
-        this.splitAttempts = 0;
-        this.ejectAttempts = 0;
-        this.ejectMacroPressed = false
-        this.ejectMacroProcessed = false
-        this.ejectTick = listener.handle.tick;
 
         this.hasPlayer = 0;
         /** @type {Player} default player */
         this.player = null;
-        // /** @type {Object<number, Player>} собственные игроки по индексу */
-        // this.playersById = {}
         /** @type {Map<number, Player>} собственные игроки*/ 
         this.players = new Map()
+        /** @type {{[cellId: string]: Cell}} */
+        this.visibleCells = { };
+        /** @type {{[cellId: string]: Cell}} */
+        this.lastVisibleCells = { };
+        /** @type {ViewArea} */
+        // this.viewArea = {
+        //     x: 0,
+        //     y: 0,
+        //     w: 1024 / 2 * this.settings.playerViewScaleMult,
+        //     h: 600 / 2 * this.settings.playerViewScaleMult,
+        //     s: 1
+        // };
+        /** @type {PlayerState} */
+        this.state = -1;
 
         this.listener.addRouter(this);
     }
@@ -51,6 +61,13 @@ class Router {
     get handle() { return this.listener.handle; }
     get logger() { return this.listener.handle.logger; }
     get settings() { return this.listener.handle.settings; }
+
+    get anyPlay() {
+        for(const [id, player] of this.players){
+            if(player.state == 0) return true
+        }
+        return false
+    }
 
     createPlayer() {
         // нужно проверять да бы не вызывалось несколько раз
@@ -76,20 +93,33 @@ class Router {
     /** @param {PlayerCell} cell @virtual */
     onNewOwnedCell(cell) { }
 
-    /** @virtual */
-    onSpawnRequest() {
-        if (!this.hasPlayer) return;
-        let name = this.spawningName.slice(0, this.settings.playerMaxNameLength);
-        /** @type {string} */
-        let skin;
-        if (this.settings.playerAllowSkinInName) {
-            const regex = /\<(.*)\>(.*)/.exec(name);
-            if (regex !== null) {
-                name = regex[2];
-                skin = regex[1];
-            }
+    // /** @virtual */
+    // onSpawnRequest() {
+    //     // if (!this.hasPlayer) return;
+    //     let name = this.spawningName.slice(0, this.settings.playerMaxNameLength);
+    //     /** @type {string} */
+    //     let skin;
+    //     if (this.settings.playerAllowSkinInName) {
+    //         const regex = /\<(.*)\>(.*)/.exec(name);
+    //         if (regex !== null) {
+    //             name = regex[2];
+    //             skin = regex[1];
+    //         }
+    //     }
+    //     for(const [id, player] of this.players){
+    //         if(player.state != 0) this.listener.handle.gamemode.onPlayerSpawnRequest(player, name, skin);
+    //     }
+    // }
+    /**
+     * @param {number} pid
+     * @param {string} name
+     */
+    onSpawnRequest(pid, name){
+        const player = this.players.get(pid)
+        if(player){
+            player.spawningName = name
+            player.spawnRequested = true
         }
-        this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, name, skin);
     }
     /** @virtual */
     onSpectateRequest() {
@@ -101,15 +131,36 @@ class Router {
         if (!this.hasPlayer) return;
         this.listener.handle.gamemode.whenPlayerPressQ(this.player);
     }
-    /** @virtual */
-    attemptSplit() {
-        if (!this.hasPlayer) return;
-        this.listener.handle.gamemode.whenPlayerSplit(this.player);
+    /** 
+     * @virtual
+     * @param {number} pid 
+     * @param {boolean} is_pressed
+     * */
+    onMacroPress(pid, is_pressed) {
+        const player = this.players.get(pid)
+        if(player) {
+            if(is_pressed == false) player.ejectMacroProcessed = false
+            player.ejectMacroPressed = is_pressed
+        }
+        
     }
-    /** @virtual */
-    attemptEject() {
-        if (!this.hasPlayer) return;
-        this.listener.handle.gamemode.whenPlayerEject(this.player);
+    /** @param {Player} player @virtual */
+    attemptEject(player) {
+        this.listener.handle.gamemode.whenPlayerEject(player);
+    }
+    ejectAttemptAdd(pid){
+        const player = this.players.get(pid)
+        if(player) player.ejectAttempts ++
+    }
+    /** @param {Player} player @virtual */
+    attemptSplit(player) {
+        this.listener.handle.gamemode.whenPlayerSplit(player);
+    }
+    splitAttemptAdd(pid){
+        const player = this.players.get(pid)
+        if(player){
+            player.splitAttempts ++
+        }
     }
 
     /** @virtual */
@@ -125,10 +176,28 @@ class Router {
     update() {
         throw new Error("Must be overriden");
     }
+    updateVisibleCells() {
+        // if (this.world === null) return;
+        delete this.lastVisibleCells;
+        this.lastVisibleCells = this.visibleCells;
+        let visibleCells = this.visibleCells = { };
+        for(const [id,player] of this.players){
+            for (let i = 0, l = player.ownedCells.length; i < l; i++) {
+                const cell = player.ownedCells[i];
+                visibleCells[cell.id] = cell;
+            }
+            player.world.finder.search(player.viewArea, (cell) => visibleCells[cell.id] = cell);
+        }
+
+        // check last visible in bounds
+        // calculate 
+    }
 }
 
 module.exports = Router;
 
 const Listener = require("./Listener");
 const Player = require("../worlds/Player");
-const PlayerCell = require("../cells/PlayerCell");
+const PlayerCell = require("../cells/PlayerCell");const Cell = require("../cells/Cell");
+const World = require("../worlds/World");
+

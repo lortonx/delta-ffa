@@ -30,5 +30,8 @@
     "engines": {
         "node": "16.x",
         "desc": "this opt for glitch.com, max support node ver is 10, uws ver v18.2.0"
+    },
+    "devDependencies": {
+        "assemblyscript": "^0.24.1"
     }
 }

@@ -122,23 +122,27 @@ class Connection extends Router {
     }
     update() {
         if (!this.hasPlayer) return;
-        if (!this.player.hasWorld) {
-            if (this.spawningName !== null)
-                this.handle.matchmaker.toggleQueued(this);
+        if (!this.player.hasWorld) { // если в игрока нету мира
+            // if (this.spawningName !== null){ // и он желает спавнится
+            //     console.log('spawning name',this.spawningName)
+            //     this.handle.matchmaker.toggleQueued(this);
+            // }
+                
             this.spawningName = null;
-            this.splitAttempts = 0;
-            this.ejectAttempts = 0;
             this.requestingSpectate = false;
             this.isPressingQ = false;
             this.hasProcessedQ = false;
+            for(const [id,player] of this.players) {
+                player.splitAttempts = 0
+                player.ejectAttempts = 0
+            }
             return;
         }
-        this.player.updateVisibleCells();
+        this.updateVisibleCells();
 
         const add = [], upd = [], eat = [], del = [];
-        const player = this.player;
-        const     visible = player.visibleCells,
-              lastVisible = player.lastVisibleCells;
+        const     visible = this.visibleCells,
+              lastVisible = this.lastVisibleCells;
         for (let id in visible) {
             const cell = visible[id];
             if (!lastVisible.hasOwnProperty(id)) add.push(cell);
@@ -151,14 +155,23 @@ class Connection extends Router {
             del.push(cell);
         }
 
-        if (player.state === 1 || player.state === 2)
-            this.protocol.onSpectatePosition(player.viewArea);
+
+        if(!this.anyPlay){
+            for(const [id,player] of this.players) {
+                if (player.state === 1 || player.state === 2){
+                    this.protocol.onSpectatePosition(player.viewArea);
+                    break
+                }
+            }
+        }
+        // if (player.state === 1 || player.state === 2)
+        //     this.protocol.onSpectatePosition(player.viewArea);
         if (this.handle.tick % 30 === 0)
             this.handle.gamemode.sendLeaderboard(this);
         this.protocol.onVisibleCellUpdate(add, upd, eat, del);
     }
-    onWorldSet() {
-        this.protocol.onNewWorldBounds(this.player.world.border, true);
+    onWorldSet(player) {
+        this.protocol.onNewWorldBounds(player.world.border, true);
     }
     /** @param {PlayerCell} cell */
     onNewOwnedCell(cell) {
@@ -189,7 +202,7 @@ class Connection extends Router {
 
 module.exports = Connection;
 
-//const WebSocket = require("uws");
+
 const Listener = require("./Listener");
 const Minion = require("../bots/Minion");
 const Protocol = require("../protocols/Protocol");

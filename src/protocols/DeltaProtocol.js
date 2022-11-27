@@ -16,7 +16,7 @@ class DeltaProtocol extends Protocol {
         this.lastLeaderboardType = null;
     }
 
-    static get type() { return "legacy"; }
+    static get type() { return "delta"; }
     get subtype() { return `l${!isNaN(this.protocol) ? ("00" + this.protocol).slice(-2) : "//"}`; }
 
     /**
@@ -47,56 +47,74 @@ class DeltaProtocol extends Protocol {
             this.gotKey = true;
             this.key = reader.readUInt32();
             this.connection.createPlayer();
+            for(const [id, player] of this.connection.players){
+                this.onNewOwnPlayer(id)
+            }
             return;
         }
         switch (messageId) {
 
-            case 0:
-                this.connection.spawningName = readZTString(reader, this.protocol);
-                break;
+            case 0:{
+                const pid = reader.readInt16()
+                const spawningName = readZTString(reader, this.protocol);
+                // this.connection.spawningName = readZTString(reader, this.protocol);
+                this.connection.onSpawnRequest(pid, spawningName)
+            }break;
             case 1:
                 this.connection.requestingSpectate = true;
+                this.connection.hasProcessedQ = false;
                 break;
             case 16:
                 if (reader.length == 11) {
                     this.connection.mouseX = reader.readInt32();
                     this.connection.mouseY = reader.readInt32();
                     const playerId = reader.readInt16();
+                    const player = this.connection.players.get(playerId)
+                    if(player) {
+                        player.mouseX = this.connection.mouseX
+                        player.mouseY = this.connection.mouseY
+                    }
                 } else {
                     return void this.fail(1003, "Unexpected message format");
                 }
                 break;
-            case 17:
+            case 17:{
+                const playerId = reader.readInt16();
+                const count = reader.readInt8();
                 if (this.connection.controllingMinions)
                     for (let i = 0, l = this.connection.minions.length; i < l; i++)
-                        this.connection.minions[i].splitAttempts++;
-                else this.connection.splitAttempts++;
-                break;
-            case 18: this.connection.isPressingQ = true; break;
+                        this.connection.minions[i].players.forEach(player => player.splitAttempts++)
+                else {
+                    this.connection.splitAttemptAdd(playerId)
+                    // this.connection.splitAttempts++;
+                }
+            }break;
+            case 18: this.connection.isPressingQ = true;this.connection.hasProcessedQ = false; break;
             case 19: this.connection.isPressingQ = this.hasProcessedQ = false; break;
             case 20: {
-                const pid = reader.readUInt32()
+                const playerId = reader.readInt16();
                 const state = !!reader.readUInt8()
-                this.connection.ejectMacroPressed = state
-                if(state == false) {
-                    this.connection.ejectMacroProcessed = state
-                }
+                this.connection.onMacroPress(playerId, state)
             }; break;
             case 21:
+                const playerId = reader.readInt16();
                 if (this.connection.controllingMinions){
                     for (let i = 0, l = this.connection.minions.length; i < l; i++)
-                        this.connection.minions[i].ejectAttempts++;
-                } else this.connection.ejectAttempts++;
+                        this.connection.minions[i].players.forEach(player => player.ejectAttempts++)
+                } else {
+                    this.connection.ejectAttemptAdd(playerId)
+                    // this.connection.ejectAttempts++;
+                }
                 break;
             case 22:
                 if (!this.gotKey || !this.settings.minionEnableERTPControls) break;
                 for (let i = 0, l = this.connection.minions.length; i < l; i++)
-                    this.connection.minions[i].splitAttempts++;
+                    this.connection.minions[i].players.forEach(player => player.splitAttempts++)
                 break;
             case 23:
                 if (!this.gotKey || !this.settings.minionEnableERTPControls) break;
                 for (let i = 0, l = this.connection.minions.length; i < l; i++)
-                    this.connection.minions[i].ejectAttempts++;
+                    this.connection.minions[i].players.forEach(player => player.ejectAttempts++)
                 break;
             case 24:
                 if (!this.gotKey || !this.settings.minionEnableERTPControls) break;

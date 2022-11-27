@@ -22,7 +22,7 @@
     "worldPlayerDisposeDelay": 1500,
     "worldEatMult": 1.140175425099138,
     "worldEatOverlapDiv": 3,
-    "worldPlayerBotsPerWorld": 20,
+    "worldPlayerBotsPerWorld": 10,
     "worldPlayerBotNames": [
         "neo's local server"
     ],
@@ -40,7 +40,7 @@
     "pelletMinSize": 9,
     "pelletMaxSize": 13,
     "pelletGrowTicks": 1500,
-    "pelletCount": 200,
+    "pelletCount": 5000,
     "virusMinCount": 20,
     "virusMaxCount": 190,
     "virusSize": 100,
@@ -69,7 +69,7 @@
     "playerMaxNameLength": 16,
     "playerAllowSkinInName": true,
     "playerMinSize": 32,
-    "playerSpawnSize": 800,
+    "playerSpawnSize": 200,
     "playerMaxSize": 3000,
     "playerMinSplitSize": 60,
     "playerMinEjectSize": 60,

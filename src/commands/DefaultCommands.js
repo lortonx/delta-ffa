@@ -530,11 +530,11 @@ module.exports = (commands, chatCommands) => {
                 const count = getInt(args, handle, 1, "count");
                 if (player === false || count === false)
                     return;
-                if (!player.router.isExternal)
+                if (!player.connection.isExternal)
                     return void handle.logger.print("player is not external");
                 if (!player.hasWorld)
                     return void handle.logger.print("player is not in a world");
-                for (let i = 0; i < count; i++) new Minion(player.router);
+                for (let i = 0; i < count; i++) new Minion(player.connection);
                 handle.logger.print(`added ${count} minions to player`);
             }
         }),
@@ -551,13 +551,13 @@ module.exports = (commands, chatCommands) => {
                 const count = getInt(args, handle, 1, "count");
                 if (player === false || count === false)
                     return;
-                if (!player.router.isExternal)
+                if (!player.connection.isExternal)
                     return void handle.logger.print("player is not external");
                 if (!player.hasWorld)
                     return void handle.logger.print("player is not in a world");
                 let realCount = 0;
-                for (let i = 0; i < count && player.router.minions.length > 0; i++) {
-                    player.router.minions[0].close();
+                for (let i = 0; i < count && player.connection.minions.length > 0; i++) {
+                    player.connection.minions[0].close();
                     realCount++;
                 }
                 handle.logger.print(`removed ${realCount} minions from player`);
@@ -618,8 +618,8 @@ module.exports = (commands, chatCommands) => {
                     return;
                 let realCount = 0;
                 for (let i = 0, l = world.players.length; i < l && realCount < count; i++) {
-                    if (world.players[i].router.type !== "playerbot") continue;
-                    world.players[i].router.close();
+                    if (world.players[i].connection.type !== "playerbot") continue;
+                    world.players[i].connection.close();
                     realCount++; i--; l--;
                 }
                 handle.logger.print(`removed ${realCount} player bots from world`);
@@ -743,6 +743,7 @@ module.exports = (commands, chatCommands) => {
                 if (!context.player.hasWorld)
                     return void chat.directMessage(null, context, "you're not in a world");
                 context.player.world.removePlayer(context.player);
+                context.player.world.removeRouter(context);
             }
         }),
         genCommand({
@@ -768,6 +769,7 @@ module.exports = (commands, chatCommands) => {
                 if (!handle.gamemode.canJoinWorld(handle.worlds[id]))
                     return void chat.directMessage(null, context, "you can't join this world");
                 handle.worlds[id].addPlayer(context.player);
+                handle.worlds[id].addRouter(context);
             }
         })
     );

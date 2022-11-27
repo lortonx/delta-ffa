@@ -31,11 +31,11 @@ class PlayerBot extends Bot {
             const names = this.listener.settings.worldPlayerBotNames;
             const skins = this.listener.settings.worldPlayerBotSkins;
             /** @type {string} */
-            this.spawningName = names[~~(Math.random() * names.length)] || "Player bot";
-            if (this.spawningName.indexOf("<*>") !== -1)
-                this.spawningName = this.spawningName.replace("<*>", `<${skins[~~(Math.random() * skins.length)]}>`);
-            this.onSpawnRequest();
-            this.spawningName = null;
+            this.player.spawningName = names[~~(Math.random() * names.length)] || "Player bot";
+            if (this.player.spawningName.indexOf("<*>") !== -1)
+                this.player.spawningName = this.player.spawningName.replace("<*>", `<${skins[~~(Math.random() * skins.length)]}>`);
+            this.player.onSpawnRequest();
+            this.player.spawningName = null;
         }
 
         /** @type {PlayerCell} */
@@ -49,8 +49,8 @@ class PlayerBot extends Bot {
             if (!this.target.exists || !this.canEat(cell.size, this.target.size))
                 this.target = null;
             else {
-                this.mouseX = this.target.x;
-                this.mouseY = this.target.y;
+                this.player.mouseX = this.target.x;
+                this.player.mouseY = this.target.y;
                 return;
             }
         }
@@ -117,14 +117,14 @@ class PlayerBot extends Bot {
                 bestPrey !== null && bestPrey.size * 2 > cell.size
             ) {
             this.target = bestPrey;
-            this.mouseX = bestPrey.x;
-            this.mouseY = bestPrey.y;
-            this.splitAttempts++;
+            this.player.mouseX = bestPrey.x;
+            this.player.mouseY = bestPrey.y;
+            this.player.splitAttempts++;
             this.splitCooldownTicks = 25;
         } else {
             const d = Math.max(1, Math.sqrt(mouseX * mouseX + mouseY * mouseY));
-            this.mouseX = cell.x + mouseX / d * player.viewArea.w;
-            this.mouseY = cell.y + mouseY / d * player.viewArea.h;
+            this.player.mouseX = cell.x + mouseX / d * player.viewArea.w;
+            this.player.mouseY = cell.y + mouseY / d * player.viewArea.h;
         }
     }
 

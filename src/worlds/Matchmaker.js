@@ -56,7 +56,10 @@ class Matchmaker {
                 const next = this.queued.shift();
                 if (this.handle.settings.matchmakerNeedsQueuing)
                     this.handle.listener.globalChat.directMessage(null, next, "match found!");
-                world.addPlayer(next.player);
+                    world.addRouter(next)
+                for(const [id, player] of next.players) {
+                    world.addPlayer(player);
+                }
             }
         }
     }

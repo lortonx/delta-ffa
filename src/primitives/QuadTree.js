@@ -85,6 +85,7 @@ class QuadTree {
      */
     remove(item) {
         const quad = item.__root;
+        if (!quad) return
         quad.items.splice(quad.items.indexOf(item), 1);
         delete item.__root;
         quad.merge();

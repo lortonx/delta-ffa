@@ -53,7 +53,9 @@ class LegacyProtocol extends Protocol {
         switch (messageId) {
             
             case 0:
-                this.connection.spawningName = readZTString(reader, this.protocol);
+                const spawningName = readZTString(reader, this.protocol);
+                const pid = this.connection.players.keys()[0]
+                this.connection.onSpawnRequest(pid,spawningName)
                 break;
             case 1:
                 this.connection.requestingSpectate = true;

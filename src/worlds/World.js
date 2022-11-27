@@ -13,10 +13,21 @@ const Virus = require("../cells/Virus");
 const ChatChannel = require("../sockets/ChatChannel");
 
 const { fullyIntersects } = require("../primitives/Misc");
-
 /**
- * @implements {Spawner}
+ * @param {any[]} arr 
+ * @param {number} i 
+ * @returns 
  */
+function unordered_remove(arr, i) {
+    if (i <= 0 || i >= arr.length) {
+        return;
+    }
+    if (i < arr.length - 1) {
+        arr[i] = arr[arr.length-1];
+    }
+    arr.length -= 1;
+}
+
 class World {
     /**
      * @param {ServerHandle} handle
@@ -42,7 +53,12 @@ class World {
         this.ejectedCells = [];
         /** @type {PlayerCell[]} */
         this.playerCells = [];
+        
+        /** @type {Router[]} */
+        this.routers = []
 
+        /** @type {Player[]} */
+        this.leaderboard = [];
         /** @type {Player[]} */
         this.players = [];
         /** @type {Player=} */
@@ -82,10 +98,16 @@ class World {
             new PlayerBot(this);
     }
     destroy() {
-        while (this.players.length > 0)
-            this.removePlayer(this.players[0]);
-        while (this.cells.length > 0)
-            this.removeCell(this.cells[0]);
+        let len = this.players.length
+        while (len--) {
+            this.removePlayer(this.players[len]);
+        }
+        len = this.cells.length
+        while (len--)
+            this.removeCell(this.cells[len]);
+        len = this.routers.length
+        while (len--)
+            this.removeRouter(this.routers[len]);
     }
 
     /**
@@ -154,7 +176,9 @@ class World {
         this.finder.remove(cell);
         delete cell.range;
         this.setCellAsNotBoosting(cell);
-        this.cells.splice(this.cells.indexOf(cell), 1);
+        // console.log(this.cells.length)
+        unordered_remove(this.cells, this.cells.indexOf(cell))
+        // this.cells.splice(this.cells.indexOf(cell), 1);
         cell.exists = false;
     }
 
@@ -163,13 +187,14 @@ class World {
         this.players.push(player);
         player.world = this;
         player.hasWorld = true;
-        this.worldChat.add(player.router);
+        this.worldChat.add(player.connection);
         this.handle.gamemode.onPlayerJoinWorld(player, this);
-        player.router.onWorldSet();
+        // обращается к игроку который еще не заспавнился
+        // player.connection.onWorldSet(player);
         this.handle.logger.debug(`player ${player.id} has been added to world ${this.id}`);
-        if (!player.router.isExternal) return;
+        if (!player.connection.isExternal) return;
         for (let i = 0; i < this.settings.worldMinionsPerPlayer; i++)
-            new Minion(player.router);
+            new Minion(player.connection);
     }
     /** @param {Player} player */
     removePlayer(player) {
@@ -177,11 +202,39 @@ class World {
         this.handle.gamemode.onPlayerLeaveWorld(player, this);
         player.world = null;
         player.hasWorld = false;
-        this.worldChat.remove(player.router);
+        this.worldChat.remove(player.connection);
         while (player.ownedCells.length > 0)
             this.removeCell(player.ownedCells[0]);
-        player.router.onWorldReset();
+        // player.router.onWorldReset();
         this.handle.logger.debug(`player ${player.id} has been removed from world ${this.id}`);
+    }
+
+    
+    /** @param {Connection|Bot} router */
+    addRouter(router) {
+        this.routers.push(router);
+        router.world = this;
+        router.hasWorld = true;
+        // this.worldChat.add(router.router);
+        // this.handle.gamemode.onPlayerJoinWorld(router, this);
+        // обращается к игроку который еще не заспавнился
+        router.onWorldSet(router);
+        this.handle.logger.debug(`router ${router} has been added to world ${this.id}`);
+        // if (!router.router.isExternal) return;
+        // for (let i = 0; i < this.settings.worldMinionsPerPlayer; i++)
+        //     new Minion(router.router);
+    }
+    /** @param {Router} router */
+    removeRouter(router) {
+        this.routers.splice(this.routers.indexOf(router), 1);
+        // this.handle.gamemode.onPlayerLeaveWorld(router, this);
+        router.world = null;
+        router.hasWorld = false;
+        // this.worldChat.remove(router.router);
+        // while (router.ownedCells.length > 0)
+        //     this.removeCell(router.ownedCells[0]);
+        router.onWorldReset();
+        this.handle.logger.debug(`player ${router} has been removed from world ${this.id}`);
     }
 
     /**
@@ -215,9 +268,37 @@ class World {
     }
     /**
      * @param {number} cellSize
+     * @param {Point} [target]
      * @returns {{ color: number, pos: Point }}
      */
-    getPlayerSpawn(cellSize) {
+    getPlayerSpawn(cellSize, target) {
+        const PLAYER_SAFE_SPAWN_RADIUS = 1
+        const safeRadius = cellSize * PLAYER_SAFE_SPAWN_RADIUS;
+
+        if (target) {
+            // const { viewportX: vx, viewportY: vy } = target;
+            // const [bx_min, bx_max, by_min, by_max] = target.box;
+            
+            // const tries = 10;
+            // const f1 = Math.max(this.options.PLAYER_VIEW_MIN, 2 * (vx - bx_min));
+            // const f2 = Math.max(this.options.PLAYER_VIEW_MIN, 2 * (bx_max - vx));
+            // const f3 = Math.max(this.options.PLAYER_VIEW_MIN, 2 * (vy - by_min));
+            // const f4 = Math.max(this.options.PLAYER_VIEW_MIN, 2 * (by_max - vy));
+            // let i = 0;
+            // while (++i < tries) {
+            //     const f = 0.5 + 0.5 * i / tries;
+            //     const xmin = vx - f * f1;
+            //     const xmax = vx + f * f2;
+            //     const ymin = vy - f * f3;
+            //     const ymax = vy + f * f4;
+            //     const [x, y] = this.randomPoint(cellSize, xmin, xmax, ymin, ymax);
+            //     if (this.wasm.is_safe(0, x, y, safeRadius, this.treePtr, this.stackPtr, this.options.IGNORE_TYPE) > 0)
+            //         return [x, y, true, i];
+            // }
+            // return [0, 0, false, i];
+            console.log(target)
+            return { color: null, pos: { x: target.x, y: target.y } }
+        }
         if (this.settings.worldSafeSpawnFromEjectedChance > Math.random() && this.ejectedCells.length > 0) {
             let tries = this.settings.worldSafeSpawnTries;
             while (--tries >= 0) {
@@ -230,7 +311,19 @@ class World {
         }
         return { color: null, pos: this.getSafeSpawnPos(cellSize) };
     }
-
+    getNearPlayerSpawn(cellSize) {
+        if (this.settings.worldSafeSpawnFromEjectedChance > Math.random() && this.ejectedCells.length > 0) {
+            let tries = this.settings.worldSafeSpawnTries;
+            while (--tries >= 0) {
+                const cell = this.ejectedCells[~~(Math.random() * this.ejectedCells.length)];
+                if (this.isSafeSpawnPos({ x: cell.x, y: cell.y, w: cellSize, h: cellSize })) {
+                    this.removeCell(cell);
+                    return { color: cell.color, pos: { x: cell.x, y: cell.y } };
+                }
+            }
+        }
+        return { color: null, pos: this.getSafeSpawnPos(cellSize) };
+    }
     /**
      * @param {Player} player
      * @param {Point} pos
@@ -238,7 +331,6 @@ class World {
      */
     spawnPlayer(player, pos, size) {
         const playerCell = new PlayerCell(player, pos.x, pos.y, size);
-      
         this.addCell(playerCell);
         player.updateState(0);
     }
@@ -249,16 +341,17 @@ class World {
 
     frozenUpdate() {
         for (let i = 0, l = this.players.length; i < l; i++) {
-            const router = this.players[i].router;
-            router.splitAttempts = 0;
-            router.ejectAttempts = 0;
+            const player = this.players[i];
+            const router = this.players[i].connection;
+            player.splitAttempts = 0;
+            player.ejectAttempts = 0;
             if (router.isPressingQ) {
                 if (!router.hasProcessedQ)
                     router.onQPress();
                 router.hasProcessedQ = true;
             } else router.hasProcessedQ = false;
             router.requestingSpectate = false;
-            router.spawningName = null;
+            player.spawningName = null;
         }
     }
 
@@ -365,6 +458,9 @@ class World {
                 this.largestPlayer = player;
         }
 
+        // 7.5 Resolve router inputs
+        for (i = 0, l = this.players.length; i < l; i++) {}
+
         // 8. Resolve inputs
         const maxTickPerEject = 1 / this.settings.playerEjectDelay;
         for (i = 0, l = this.players.length; i < l; i++) {
@@ -373,33 +469,33 @@ class World {
             if (!player.exists) { i--; l--; continue; }
             if (player.state === 1 && this.largestPlayer == null)
                 player.updateState(2);
-            const router_pl = player.router;
-            for (let j = 0, k = this.settings.playerSplitCap; j < k && router_pl.splitAttempts > 0; j++) {
-                router_pl.attemptSplit();
-                router_pl.splitAttempts--;
+            const router_pl = player.connection;
+            for (let j = 0, k = this.settings.playerSplitCap; j < k && player.splitAttempts > 0; j++) {
+                router_pl.attemptSplit(player);
+                player.splitAttempts--;
             }
             const nextEjectTick = this.handle.tick - this.settings.playerEjectDelay;
-            if (router_pl.ejectAttempts > 0/* && nextEjectTick >= router.ejectTick*/) {
-                const maxPerTick = ~~((nextEjectTick / router_pl.ejectTick) / this.settings.playerEjectDelay);
-                let ejectAttempts = router_pl.ejectAttempts > maxPerTick ? maxPerTick: router_pl.ejectAttempts;
+            if (player.ejectAttempts > 0/* && nextEjectTick >= player.ejectTick*/) {
+                const maxPerTick = ~~((nextEjectTick / player.ejectTick) / this.settings.playerEjectDelay);
+                let ejectAttempts = player.ejectAttempts > maxPerTick ? maxPerTick: player.ejectAttempts;
                 while(ejectAttempts--){
-                    router_pl.attemptEject();
+                    router_pl.attemptEject(player);
                 }
-                router_pl.ejectAttempts = 0
-                router_pl.ejectTick = this.handle.tick;
+                player.ejectAttempts = 0
+                player.ejectTick = this.handle.tick;
             }
-            if (router_pl.ejectMacroPressed) {
-                if(router_pl.ejectMacroProcessed == false){
-                    router_pl.ejectTick = this.handle.tick
-                    router_pl.ejectMacroProcessed = true
+            if (player.ejectMacroPressed) {
+                if(player.ejectMacroProcessed == false){
+                    player.ejectTick = this.handle.tick
+                    player.ejectMacroProcessed = true
                 }
-                const протикало_с_последнего_выброса = this.handle.tick - router_pl.ejectTick
+                const протикало_с_последнего_выброса = this.handle.tick - player.ejectTick
                 let maxEjectedPerTick = ~~(протикало_с_последнего_выброса * maxTickPerEject);//0.5 // пол тика в один выброс
                 if(maxEjectedPerTick>=1){
                     while(maxEjectedPerTick--){
-                        router_pl.attemptEject();
+                        router_pl.attemptEject(player);
                     }
-                    router_pl.ejectTick = this.handle.tick;
+                    player.ejectTick = this.handle.tick;
                 }
 
             }
@@ -412,9 +508,9 @@ class World {
                 router_pl.onSpectateRequest();
                 router_pl.requestingSpectate = false;
             }
-            if (router_pl.spawningName !== null) {
-                router_pl.onSpawnRequest();
-                router_pl.spawningName = null;
+            if (player.spawningName !== null) {
+                player.onSpawnRequest();
+                player.spawningName = null;
             }
             player.updateViewArea();
         }
@@ -552,10 +648,11 @@ class World {
      * @param {PlayerCell} cell
      */
     movePlayerCell(cell) {
-        const router = cell.owner.router;
+        const router = cell.owner.connection;
+        const player = cell.owner;
         if (router.disconnected) return;
-        let dx = router.mouseX - cell.x;
-        let dy = router.mouseY - cell.y;
+        let dx = player.mouseX - cell.x;
+        let dy = player.mouseY - cell.y;
         const d = Math.sqrt(dx * dx + dy * dy);
         if (d < 1) return; dx /= d; dy /= d;
         const m = Math.min(cell.moveSpeed, d) * this.handle.stepMult;
@@ -610,7 +707,6 @@ class World {
      * @param {Player} player
      */
     splitPlayer(player) {
-        const router = player.router;
         const l = player.ownedCells.length;
         let i = 0;
         for (; i < l; i++) {
@@ -619,8 +715,8 @@ class World {
             const cell = player.ownedCells[i];
             if (cell.size < this.settings.playerMinSplitSize)
                 continue;
-            let dx = router.mouseX - cell.x;
-            let dy = router.mouseY - cell.y;
+            let dx = player.mouseX - cell.x;
+            let dy = player.mouseY - cell.y;
             let d = Math.sqrt(dx * dx + dy * dy);
             if (d < 1) dx = 1, dy = 0, d = 1;
             else dx /= d, dy /= d;
@@ -638,7 +734,7 @@ class World {
     ejectFromPlayer(player) {
         const dispersion = this.settings.ejectDispersion;
         const loss = this.settings.ejectingLoss * this.settings.ejectingLoss;
-        const router = player.router;
+        const router = player.connection;
         const l = player.ownedCells.length;
         let ejected = 0
         for (let i = 0; i < l; i++) {
@@ -646,8 +742,8 @@ class World {
             if (cell.size < this.settings.playerMinEjectSize)
                 continue;
             ejected++
-            let dx = router.mouseX - cell.x;
-            let dy = router.mouseY - cell.y;
+            let dx = player.mouseX - cell.x;
+            let dy = player.mouseY - cell.y;
             let d = Math.sqrt(dx * dx + dy * dy);
             if (d < 1) dx = 1, dy = 0, d = 1;
             else dx /= d, dy /= d;
@@ -731,7 +827,7 @@ class World {
         let internal = 0, external = 0, playing = 0, spectating = 0;
         for (let i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
-            if (!player.router.isExternal) { internal++; continue; }
+            if (!player.connection.isExternal) { internal++; continue; }
             external++;
             if (player.state === 0) playing++;
             else if (player.state === 1 || player.state === 2)
@@ -753,4 +849,7 @@ module.exports = World;
 
 const Cell = require("../cells/Cell");
 const Player = require("./Player");
-const ServerHandle = require("../ServerHandle");
+const ServerHandle = require("../ServerHandle");const Router = require("../sockets/Router");
+const Connection = require("../sockets/Connection");
+const Bot = require("../bots/Bot");
+
