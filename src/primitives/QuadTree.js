@@ -55,6 +55,12 @@ class QuadTree {
         item.__root = quad;
         quad.items.push(item);
         quad.split();
+
+        // if (quad.items.length > this.maxItems) {
+        //     item.color = 0xFC0004
+        //     item.size = 90
+        //     console.log(`${item.x} ${item.y}`)
+        // }
     }
     /**
      * @param {QuadItem<T>} item
@@ -209,13 +215,13 @@ class QuadTree {
      */
     getQuadrant(a) {
         const quad = getQuadFullIntersect(a, this.range);
-        if (quad.t) {
-            if (quad.l) return 0;
-            if (quad.r) return 1;
+        if (0x1 & quad) { // t
+            if (0x4 & quad) return 0; // l 
+            if (0x8 & quad) return 1; // r 
         }
-        if (quad.b) {
-            if (quad.l) return 2;
-            if (quad.r) return 3;
+        if (0x2 & quad) { // b
+            if (0x4 & quad) return 2; // l
+            if (0x8 & quad) return 3; // r
         }
         return -1;
     }

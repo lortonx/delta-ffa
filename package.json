@@ -6,8 +6,8 @@
 	"scripts": {
 		"start": "node cli/index.js",
 		"start2": "nodemon --experimental-specifier-resolution=node --inspect cli/index.js --ignore 'logs/*' --ignore settings.json --ignore log-settings.json --ignore 'assembly/*'",
-		"asbuild:debug": "asc assembly/index.ts --target debug",
-		"asbuild:dev": "nodemon -e ts -w ./assembly --exec \"npm run asbuild:debug\"",
+		"asbuild:debug": "asc assembly/index.ts --target debug --sourceMap",
+		"asbuild:dev": "nodemon -e ts -w ./assembly --exec \"npm run asbuild:debug && npm run test\"",
 		"asbuild:release": "asc assembly/index.ts --target release",
 		"asbuild": "npm run asbuild:debug && npm run asbuild:release",
 		"test": "node tests"

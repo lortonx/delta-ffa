@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <script type="module">
-import { add } from "./build/release.js";
-document.body.innerText = add(1, 2);
+import * as wasm from "./build/debug.js";
+console.log(wasm.sayHi())
+console.log(wasm.memory)
+// import { add } from "./build/release.js";
 </script>
 </head>
 <body></body>

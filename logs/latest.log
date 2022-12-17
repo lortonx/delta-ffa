@@ -1,46 +1,7 @@
-2022-11-27 15:03:29.559 [INFO] starting
-2022-11-27 15:03:29.561 [DEBUG] listener opening at 8080
-2022-11-27 15:03:29.562 [DEBUG] listener opening at 8080
-2022-11-27 15:03:29.566 [INFO] ticker begin
-2022-11-27 15:03:29.566 [INFO] OgarII 1.4.0
-2022-11-27 15:03:29.566 [INFO] gamemode: FFA
-2022-11-27 15:03:30.329 [ACCESS] REQUEST FROM 127.0.0.1, Origin: https://agar.io
-2022-11-27 15:03:30.329 [DEBUG] client verification passed
-2022-11-27 15:03:30.329 [ACCESS] CONNECTION FROM 127.0.0.1
-2022-11-27 15:03:30.333 [DEBUG] added a player with id 1
-2022-11-27 15:03:30.333 [DEBUG] added a player with id 2
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 3
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 3 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 4
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 4 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 5
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 5 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 6
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 6 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 7
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 7 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 8
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 8 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 9
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 9 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 10
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 10 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 11
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 11 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a player with id 12
-2022-11-27 15:03:30.377 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] player 12 has been added to world 1
-2022-11-27 15:03:30.377 [DEBUG] added a world with id 1
-2022-11-27 15:03:30.378 [DEBUG] router [object Object] has been added to world 1
-2022-11-27 15:03:30.378 [DEBUG] player 1 has been added to world 1
-2022-11-27 15:03:30.378 [DEBUG] player 2 has been added to world 1
-2022-11-27 15:03:30.568 [DEBUG] command stream open
+2022-12-14 21:56:17.305 [INFO] starting
+2022-12-14 21:56:17.308 [DEBUG] listener opening at 8080
+2022-12-14 21:56:17.309 [DEBUG] listener opening at 8080
+2022-12-14 21:56:17.314 [INFO] ticker begin
+2022-12-14 21:56:17.315 [INFO] OgarII 1.4.0
+2022-12-14 21:56:17.315 [INFO] gamemode: FFA
+2022-12-14 21:56:18.312 [DEBUG] command stream open

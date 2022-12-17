@@ -70,15 +70,14 @@ const IPv4MappedValidate = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/;
     /**
      * @param {Rect} a
      * @param {Rect} b
-     * @returns {Quadrant}
      */
     export function getQuadFullIntersect(a, b) {
-        return {
-            t: a.y - a.h < b.y && a.y + a.h < b.y,
-            b: a.y - a.h > b.y && a.y + a.h > b.y,
-            l: a.x - a.w < b.x && a.x + a.w < b.x,
-            r: a.x - a.w > b.x && a.x + a.w > b.x
-        };
+        return (
+            (a.y - a.h < b.y && a.y + a.h < b.y?0x1:0x0) |  // t
+            (a.y - a.h > b.y && a.y + a.h > b.y?0x2:0x0) |  // b
+            (a.x - a.w < b.x && a.x + a.w < b.x?0x4:0x0) |  // l
+            (a.x - a.w > b.x && a.x + a.w > b.x?0x8:0x0)    // r
+        )
     }
 
     /**

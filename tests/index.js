@@ -1,4 +1,4 @@
 import assert from "assert";
-import { add } from "../build/debug.js";
-assert.strictEqual(add(1, 2), 3);
-console.log("ok");
+import * as wasm from "../build/debug.js";
+console.log(wasm.sayHi())
+// console.log(add(1, 2));

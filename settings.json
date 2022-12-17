@@ -40,7 +40,7 @@
     "pelletMinSize": 9,
     "pelletMaxSize": 13,
     "pelletGrowTicks": 1500,
-    "pelletCount": 5000,
+    "pelletCount": 10000,
     "virusMinCount": 20,
     "virusMaxCount": 190,
     "virusSize": 100,
